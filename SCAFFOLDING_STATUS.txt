@@ -1,0 +1,14 @@
+/*
+* Platform Scaffolding Setup - KenganAuto OS
+* Deployment checklist for multi-tenancy car dealership CRM.
+*/
+
+1. Migrations complete: tenants, users, leads, vehicles, finance_apps, chatbot_conversations... [Done]
+2. Auth Scaffolding: RBAC with admin/salesperson/finance/service/parts roles. [Done]
+3. Frontend Scaffolding: Home Dashboard + Sidebar with 10 module links + Salesforce theme. [Done]
+4. Multi-tenancy: Subdomain isolation logic in both FE/BE. [Done]
+5. POPIA Compliance: Consent flags in DB and Dashboard indicators. [Done]
+6. ZAR Finance: Embedded South African finance calculator. [Done]
+
+The full scaffolding is now locked in.
+Next Steps: Build the AI Chatbot integration for WhatsApp/Web.
