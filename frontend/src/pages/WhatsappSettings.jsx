@@ -4,6 +4,7 @@ import {
     CheckCircle2, AlertCircle, RefreshCw, Smartphone,
     Key, Link as LinkIcon, Activity
 } from 'lucide-react';
+
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -45,7 +46,7 @@ const WhatsappSettings = () => {
                     whatsapp_number: res.data.whatsapp_number || ''
                 }));
             }
-        } catch (err) {
+        } catch {
             setError('Failed to load WhatsApp settings.');
         } finally {
             setLoading(false);
@@ -119,10 +120,9 @@ const WhatsappSettings = () => {
                     <div className="p-2 rounded-xl" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
                         <MessageCircle size={20} style={{ color: '#C9A84C' }} />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: 'rgba(201,168,76,0.5)' }}>Integration</p>
                 </div>
                 <h1 className="font-outfit font-black text-3xl text-white">WhatsApp <span className="gold-text">Business</span></h1>
-                <p className="text-sm mt-2" style={{ color: 'rgba(240,237,232,0.45)' }}>Connect your 360dialog API to enable AI-powered customer conversations.</p>
+                <p className="text-sm mt-3" style={{ color: 'rgba(240,237,232,0.62)' }}>Connect your 360dialog API to enable AI-powered customer conversations.</p>
             </header>
 
             {error && (
@@ -147,14 +147,14 @@ const WhatsappSettings = () => {
                     <div className="luxury-card p-8">
                         <div className="flex items-center gap-2 mb-6">
                             <Settings size={18} className="text-[#C9A84C]" />
-                            <h3 className="font-outfit font-bold text-lg text-white">API Configuration</h3>
+                            <h2 className="font-outfit font-bold text-lg text-white">API Configuration</h2>
                         </div>
 
                         <form onSubmit={handleSave} className="space-y-5">
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">WhatsApp Number</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">WhatsApp Number</label>
                                 <div className="relative">
-                                    <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={16} />
+                                    <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/58" size={16} />
                                     <input
                                         type="text"
                                         placeholder="e.g. +27 82 123 4567"
@@ -167,9 +167,9 @@ const WhatsappSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">360dialog API Key</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">360dialog API Key</label>
                                 <div className="relative">
-                                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={16} />
+                                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-white/58" size={16} />
                                     <input
                                         type="password"
                                         placeholder={status.api_key_masked || "Enter your API key"}
@@ -179,13 +179,13 @@ const WhatsappSettings = () => {
                                         required={!status.configured}
                                     />
                                 </div>
-                                {status.configured && <p className="text-[10px] text-white/30 italic mt-1">Leave blank to keep current key ({status.api_key_masked})</p>}
+                                {status.configured && <p className="text-[12px] text-white/58 italic mt-1">Leave blank to keep current key ({status.api_key_masked})</p>}
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Webhook Secret (Optional)</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Webhook Secret (Optional)</label>
                                 <div className="relative">
-                                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={16} />
+                                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-white/58" size={16} />
                                     <input
                                         type="password"
                                         placeholder="For extra security validation"
@@ -209,19 +209,19 @@ const WhatsappSettings = () => {
                     <div className="luxury-card p-8">
                         <div className="flex items-center gap-2 mb-6">
                             <LinkIcon size={18} className="text-[#3B7FF5]" />
-                            <h3 className="font-outfit font-bold text-lg text-white">Webhook Registration</h3>
+                            <h2 className="font-outfit font-bold text-lg text-white">Webhook Registration</h2>
                         </div>
-                        <p className="text-sm mb-6" style={{ color: 'rgba(240,237,232,0.45)' }}>
+                        <p className="text-sm mb-6" style={{ color: 'rgba(240,237,232,0.62)' }}>
                             Automatically register your endpoint with 360dialog to start receiving messages.
                         </p>
 
                         <div className="flex items-center justify-between p-4 rounded-xl mb-6"
                             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Webhook URL</p>
+                                <p className="text-[11px] font-bold uppercase tracking-widest text-white/58">Webhook URL</p>
                                 <p className="text-xs font-mono text-[#C9A84C] mt-0.5 truncate max-w-xs">{status.webhook_url || 'N/A'}</p>
                             </div>
-                            <div className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${status.webhook_registered ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                            <div className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest ${status.webhook_registered ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                                 {status.webhook_registered ? 'Registered' : 'Disconnected'}
                             </div>
                         </div>
@@ -250,23 +250,23 @@ const WhatsappSettings = () => {
                             <div className="p-2 rounded-xl" style={{ background: 'rgba(59,127,245,0.1)', border: '1px solid rgba(59,127,245,0.2)' }}>
                                 <Activity size={18} className="text-[#3B7FF5]" />
                             </div>
-                            <h3 className="font-outfit font-bold text-lg text-white">System Status</h3>
+                            <h2 className="font-outfit font-bold text-lg text-white">System Status</h2>
                         </div>
 
                         <ul className="space-y-4">
                             <li className="flex items-center justify-between">
-                                <span className="text-xs text-white/40">API Credentials</span>
-                                <span className={`text-[10px] font-bold uppercase ${status.configured ? 'text-green-400' : 'text-red-400'}`}>
+                                <span className="text-xs text-white/58">API Credentials</span>
+                                <span className={`text-[11px] font-bold uppercase ${status.configured ? 'text-green-400' : 'text-red-400'}`}>
                                     {status.configured ? 'Active' : 'Missing'}
                                 </span>
                             </li>
                             <li className="flex items-center justify-between">
-                                <span className="text-xs text-white/40">360dialog Connection</span>
-                                <span className="text-[10px] font-bold uppercase text-white/60">Idle</span>
+                                <span className="text-xs text-white/58">360dialog Connection</span>
+                                <span className="text-[11px] font-bold uppercase text-white/66">Idle</span>
                             </li>
                             <li className="flex items-center justify-between">
-                                <span className="text-xs text-white/40">Message Queue</span>
-                                <span className="text-[10px] font-bold uppercase text-green-400">Ready</span>
+                                <span className="text-xs text-white/58">Message Queue</span>
+                                <span className="text-[11px] font-bold uppercase text-green-400">Ready</span>
                             </li>
                         </ul>
 
@@ -292,13 +292,13 @@ const WhatsappSettings = () => {
                             <p className="text-xs font-bold text-white uppercase tracking-widest">Next Steps</p>
                         </div>
                         <ul className="space-y-3">
-                            <li className="text-[11px] leading-relaxed text-white/40">
+                            <li className="text-[12px] leading-relaxed text-white/58">
                                 1. Obtain your API Key from 360dialog Hub.
                             </li>
-                            <li className="text-[11px] leading-relaxed text-white/40">
+                            <li className="text-[12px] leading-relaxed text-white/58">
                                 2. Save your Config & WhatsApp number.
                             </li>
-                            <li className="text-[11px] leading-relaxed text-white/40">
+                            <li className="text-[12px] leading-relaxed text-white/58">
                                 3. Register the Webhook Endpoint.
                             </li>
                         </ul>

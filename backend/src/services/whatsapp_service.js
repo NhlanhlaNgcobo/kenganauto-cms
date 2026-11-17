@@ -249,8 +249,8 @@ function _enqueue(tenantId, to, type, payload, priority = false) {
  * Save (or update) the decrypted API key for a tenant.
  * Call this after decrypting from DB.
  */
-function setTenantConfig(tenantId, { apiKey, whatsappNumber, webhookSecret }) {
-    TenantConfigStore.set(tenantId, { apiKey, whatsappNumber, webhookSecret });
+function setTenantConfig(tenantId, { apiKey, whatsappNumber, webhookSecret, tenantName }) {
+    TenantConfigStore.set(tenantId, { apiKey, whatsappNumber, webhookSecret, tenantName });
     logger.info({ tenantId }, 'WhatsApp config loaded');
 }
 

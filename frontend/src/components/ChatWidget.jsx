@@ -65,21 +65,21 @@ const ExtrasPanel = ({ extras }) => {
                 <div className="px-4 py-2.5 flex items-center gap-2"
                     style={{ background: 'rgba(201,168,76,0.08)', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
                     <Calculator size={13} style={{ color: '#C9A84C' }} />
-                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#C9A84C' }}>
+                    <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#C9A84C' }}>
                         Finance Scenarios @ {rate}%
                     </span>
                 </div>
                 <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                     {scenarios.map(s => (
                         <div key={s.term_months} className="flex items-center justify-between px-4 py-2.5">
-                            <span className="text-[11px] font-bold" style={{ color: 'rgba(240,237,232,0.5)' }}>
+                            <span className="text-[12px] font-bold" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 {s.term_months} months
                             </span>
                             <div className="text-right">
                                 <p className="font-outfit font-black text-sm" style={{ color: '#C9A84C' }}>
                                     R {s.monthly.toLocaleString()} / mo
                                 </p>
-                                <p className="text-[9px]" style={{ color: 'rgba(240,237,232,0.3)' }}>
+                                <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     Total: R {s.total_repayable.toLocaleString()}
                                 </p>
                             </div>
@@ -95,13 +95,13 @@ const ExtrasPanel = ({ extras }) => {
         return (
             <div className="mx-3 mb-3 px-4 py-3 rounded-xl"
                 style={{ border: '1px solid rgba(251,146,60,0.2)', background: 'rgba(251,146,60,0.05)' }}>
-                <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#FB923C' }}>
+                <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: '#FB923C' }}>
                     Trade-In Estimate
                 </p>
                 <p className="font-outfit font-black text-lg" style={{ color: '#FB923C' }}>
                     R {low.toLocaleString()} – R {high.toLocaleString()}
                 </p>
-                <p className="text-[9px] mt-1" style={{ color: 'rgba(240,237,232,0.4)' }}>{note}</p>
+                <p className="text-[12px] mt-1" style={{ color: 'rgba(240,237,232,0.62)' }}>{note}</p>
             </div>
         );
     }
@@ -261,7 +261,7 @@ const ChatWidget = ({
                     className="h-16 w-16 rounded-2xl flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95"
                     style={{
                         background: 'linear-gradient(135deg, #C9A84C, #9A7830)',
-                        boxShadow: '0 8px 32px rgba(201,168,76,0.4)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
                     }}>
                     <MessageCircle size={26} className="text-[#0A0F1E]" />
                 </button>
@@ -293,10 +293,10 @@ const ChatWidget = ({
                                 <p className="font-outfit font-black text-sm text-white leading-none">Kengan</p>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                     {isOnline
-                                        ? <><div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 4px #4ADE80' }} /><span className="text-[9px] font-bold text-green-400">Online</span></>
-                                        : <><WifiOff size={10} className="text-red-400" /><span className="text-[9px] text-red-400">Offline</span></>
+                                        ? <><div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: 'none' }} /><span className="text-[12px] font-bold text-green-400">Online</span></>
+                                        : <><WifiOff size={10} className="text-red-400" /><span className="text-[12px] text-red-400">Offline</span></>
                                     }
-                                    {isHandoff && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(248,113,113,0.15)', color: '#F87171' }}>Transfer in progress</span>}
+                                    {isHandoff && <span className="text-[12px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(248,113,113,0.15)', color: '#F87171' }}>Transfer in progress</span>}
                                 </div>
                             </div>
                         </div>
@@ -304,7 +304,7 @@ const ChatWidget = ({
                         <div className="flex items-center gap-2">
                             {/* Intent badge */}
                             {intentStyle && (
-                                <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full"
+                                <span className="text-[11px] font-black uppercase tracking-widest px-2 py-1 rounded-full"
                                     style={{ background: `${intentStyle.color}15`, color: intentStyle.color, border: `1px solid ${intentStyle.color}30` }}>
                                     {intentStyle.label}
                                 </span>
@@ -314,7 +314,7 @@ const ChatWidget = ({
                                 <div className="w-1.5 h-1.5 rounded-full" style={{ background: sentimentColor, boxShadow: `0 0 6px ${sentimentColor}` }} />
                             )}
                             {!embedded && (
-                                <button onClick={toggle} className="p-1.5 rounded-lg transition-all hover:bg-white/10" style={{ color: 'rgba(240,237,232,0.5)' }}>
+                                <button onClick={toggle} className="p-1.5 rounded-lg transition-all hover:bg-white/10" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     <X size={16} />
                                 </button>
                             )}
@@ -331,11 +331,11 @@ const ChatWidget = ({
                                         <div className="flex items-center gap-1.5 mb-1 ml-1">
                                             <div className="w-5 h-5 rounded-lg flex items-center justify-center"
                                                 style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
-                                                <span className="text-[8px] font-black text-[#C9A84C]">KA</span>
+                                                <span className="text-[12px] font-black text-[#C9A84C]">KA</span>
                                             </div>
-                                            <span className="text-[9px] font-bold" style={{ color: 'rgba(201,168,76,0.5)' }}>Kengan</span>
+                                            <span className="text-[12px] font-bold" style={{ color: 'rgba(201,168,76,0.8)' }}>Kengan</span>
                                             {msg.degraded && (
-                                                <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#FBBF24' }}>offline mode</span>
+                                                <span className="text-[12px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#FBBF24' }}>offline mode</span>
                                             )}
                                         </div>
                                     )}
@@ -357,7 +357,7 @@ const ChatWidget = ({
                                         }}>
                                         {renderContent(msg.content)}
                                     </div>
-                                    <p className="text-[9px] mt-1 px-1" style={{ color: 'rgba(240,237,232,0.2)', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+                                    <p className="text-[12px] mt-1 px-1" style={{ color: 'rgba(240,237,232,0.62)', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                                         {new Date(msg.timestamp).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}
                                     </p>
                                 </div>
@@ -390,7 +390,7 @@ const ChatWidget = ({
                             ].map(chip => (
                                 <button key={chip.text}
                                     onClick={() => { setInputText(chip.text); setTimeout(sendMessage, 0); setInputText(chip.text); }}
-                                    className="text-[10px] font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105"
+                                    className="text-[12px] font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105"
                                     style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(201,168,76,0.8)' }}>
                                     {chip.label}
                                 </button>
@@ -414,7 +414,7 @@ const ChatWidget = ({
                                     background: 'rgba(255,255,255,0.05)',
                                     border: '1px solid rgba(201,168,76,0.15)',
                                     color: '#F0EDE8',
-                                    fontFamily: 'Inter',
+                                    fontFamily: 'Archivo, ui-sans-serif, system-ui, sans-serif',
                                     lineHeight: 1.4,
                                     maxHeight: 100,
                                 }}
@@ -427,12 +427,12 @@ const ChatWidget = ({
                                     background: inputText.trim() && !isTyping
                                         ? 'linear-gradient(135deg, #C9A84C, #9A7830)'
                                         : 'rgba(255,255,255,0.06)',
-                                    color: inputText.trim() && !isTyping ? '#0A0F1E' : 'rgba(240,237,232,0.3)',
+                                    color: inputText.trim() && !isTyping ? '#0A0F1E' : 'rgba(240,237,232,0.66)',
                                 }}>
                                 <Send size={16} />
                             </button>
                         </div>
-                        <p className="text-center text-[9px] mt-2" style={{ color: 'rgba(240,237,232,0.15)' }}>
+                        <p className="text-center text-[12px] mt-2" style={{ color: 'rgba(240,237,232,0.62)' }}>
                             Powered by KenganAuto AI · POPIA compliant
                         </p>
                     </div>

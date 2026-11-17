@@ -122,7 +122,7 @@ router.post('/bookings', async (req, res) => {
 
     // Simulate Outbound WhatsApp sending
     if (data.customer_phone) {
-        whatsappSvc.sendText(tenantId, data.customer_phone, `Welcome to KenganAuto Service Department!\n\n${msg}\n\nPlease bring your service book. Let us know if you need to reschedule.`)
+        Promise.resolve().then(() => whatsappSvc.sendText(tenantId, data.customer_phone, `Welcome to KenganAuto Service Department!\n\n${msg}\n\nPlease bring your service book. Let us know if you need to reschedule.`))
             .catch(console.error);
     }
 
@@ -155,8 +155,13 @@ router.patch('/bookings/:id', authenticate, async (req, res) => {
 
     // Send WhatsApp if ready for collection
     if (patch.status === 'ready_for_collection' && updated.customer_phone) {
-        whatsappSvc.sendText(tenantId, updated.customer_phone, `Good news! Your ${updated.vehicle_make} is ready for collection at KenganAuto. Outstanding balance: R${updated.invoice_amount || '0.00'}. See you soon!`)
+        Promise.resolve().then(() => whatsappSvc.sendText(tenantId, updated.customer_phone, `Good news! Your ${updated.vehicle_make} is ready for collection at KenganAuto. Outstanding balance: R${updated.invoice_amount || '0.00'}. See you soon!`))
             .catch(console.error);
+    }
+
+    // Post-service CSI survey via WhatsApp (AI-triaged; low scores auto-open a concern)
+    if (patch.status === 'completed') {
+        require('./customer_care').sendServiceCsi(tenantId, updated);
     }
 
     res.json({ ok: true, booking: updated });

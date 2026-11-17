@@ -14,7 +14,7 @@
  *   className       {string}  - extra classes
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Calculator, Info, ChevronDown, AlertTriangle,
     ShieldCheck, ArrowUpRight, RefreshCw, Copy, Check,
@@ -90,8 +90,8 @@ function LuxSlider({ label, value, min, max, step, onChange, display, hint }) {
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em]"
-                    style={{ color: 'rgba(240,237,232,0.35)' }}>{label}</label>
+                <label className="text-[11px] font-black uppercase tracking-[0.2em]"
+                    style={{ color: 'rgba(240,237,232,0.62)' }}>{label}</label>
                 <span className="text-sm font-outfit font-black" style={{ color: '#C9A84C' }}>{display}</span>
             </div>
             <div className="relative h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
@@ -103,7 +103,7 @@ function LuxSlider({ label, value, min, max, step, onChange, display, hint }) {
                 <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 pointer-events-none"
                     style={{ left: `${pct}%`, transform: `translate(-50%, -50%)`, background: '#C9A84C', borderColor: '#0A0F1E' }} />
             </div>
-            {hint && <div className="flex justify-between text-[9px] font-bold" style={{ color: 'rgba(240,237,232,0.2)' }}>
+            {hint && <div className="flex justify-between text-[12px] font-bold" style={{ color: 'rgba(240,237,232,0.62)' }}>
                 {hint}
             </div>}
         </div>
@@ -168,7 +168,7 @@ export default function FinanceCalculator({
                     style={{
                         background: term === t ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.03)',
                         border: `1px solid ${term === t ? 'rgba(201,168,76,0.4)' : 'rgba(255,255,255,0.07)'}`,
-                        color: term === t ? '#C9A84C' : 'rgba(240,237,232,0.4)',
+                        color: term === t ? '#C9A84C' : 'rgba(240,237,232,0.66)',
                     }}>
                     {t}m
                 </button>
@@ -186,7 +186,7 @@ export default function FinanceCalculator({
                     style={{
                         background: balloonPct === b ? (b > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(201,168,76,0.15)') : 'rgba(255,255,255,0.03)',
                         border: `1px solid ${balloonPct === b ? (b > 0 ? 'rgba(239,68,68,0.3)' : 'rgba(201,168,76,0.4)') : 'rgba(255,255,255,0.07)'}`,
-                        color: balloonPct === b ? (b > 0 ? '#F87171' : '#C9A84C') : 'rgba(240,237,232,0.4)',
+                        color: balloonPct === b ? (b > 0 ? '#F87171' : '#C9A84C') : 'rgba(240,237,232,0.66)',
                     }}>
                     {b}%
                 </button>
@@ -203,13 +203,13 @@ export default function FinanceCalculator({
                         <Calculator size={20} style={{ color: '#C9A84C' }} />
                     </div>
                     <div>
-                        <h3 className="font-outfit font-black text-xl text-white">Finance Calculator</h3>
-                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>
+                        <h2 className="font-outfit font-black text-xl text-white">Finance Calculator</h2>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] mt-0.5" style={{ color: 'rgba(201,168,76,0.8)' }}>
                             NCA Compliant · ZAR · Prime {SA_RATES.prime}%
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold"
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-bold"
                     style={{ background: 'rgba(74,222,128,0.07)', border: '1px solid rgba(74,222,128,0.2)', color: '#4ADE80' }}>
                     <ShieldCheck size={11} /> NCR Compliant
                 </div>
@@ -231,15 +231,15 @@ export default function FinanceCalculator({
                 {/* ── Deposit ── */}
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]"
-                            style={{ color: 'rgba(240,237,232,0.35)' }}>Deposit</span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em]"
+                            style={{ color: 'rgba(240,237,232,0.62)' }}>Deposit</span>
                         <div className="flex gap-1">
                             {['pct', 'amount'].map(mode => (
                                 <button key={mode} onClick={() => setDepositMode(mode)}
-                                    className="px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all"
+                                    className="px-2 py-0.5 rounded-lg text-[12px] font-bold transition-all"
                                     style={{
                                         background: depositMode === mode ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.04)',
-                                        color: depositMode === mode ? '#C9A84C' : 'rgba(240,237,232,0.3)',
+                                        color: depositMode === mode ? '#C9A84C' : 'rgba(240,237,232,0.66)',
                                     }}>
                                     {mode === 'pct' ? '%' : 'R'}
                                 </button>
@@ -265,7 +265,7 @@ export default function FinanceCalculator({
                                 step={5000} min={0} max={vehiclePrice * 0.5} />
                         </div>
                     )}
-                    <p className="text-[10px]" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                    <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                         Loan principal: {fmt(vehiclePrice - deposit)} · Incl. initiation fee: {fmt(vehiclePrice - deposit + SA_RATES.initiationFee)}
                     </p>
                 </div>
@@ -275,17 +275,17 @@ export default function FinanceCalculator({
                 {/* ── Term, Rate, Balloon ── */}
                 <div className="space-y-4">
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2"
-                            style={{ color: 'rgba(240,237,232,0.35)' }}>Loan Term</p>
+                        <p className="text-[11px] font-black uppercase tracking-[0.2em] mb-2"
+                            style={{ color: 'rgba(240,237,232,0.62)' }}>Loan Term</p>
                         <TermPills />
                     </div>
 
                     {/* Interest rate — editable */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em]"
-                                style={{ color: 'rgba(240,237,232,0.35)' }}>Interest Rate (APR est.)</p>
-                            <span className="text-[10px]" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                            <p className="text-[11px] font-black uppercase tracking-[0.2em]"
+                                style={{ color: 'rgba(240,237,232,0.62)' }}>Interest Rate (APR est.)</p>
+                            <span className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 Prime {SA_RATES.prime}% + {Math.round((rate - SA_RATES.prime) * 10) / 10}%
                             </span>
                         </div>
@@ -295,8 +295,8 @@ export default function FinanceCalculator({
                                 className="lux-input text-sm flex-1" />
                             <span className="text-sm font-black" style={{ color: '#C9A84C' }}>%</span>
                             <button onClick={() => setRate(SA_RATES.defaultRate)}
-                                className="px-3 py-2.5 rounded-xl text-[10px] font-bold transition-all"
-                                style={{ background: 'rgba(201,168,76,0.07)', border: '1px solid rgba(201,168,76,0.15)', color: 'rgba(201,168,76,0.6)' }}>
+                                className="px-3 py-2.5 rounded-xl text-[12px] font-bold transition-all"
+                                style={{ background: 'rgba(201,168,76,0.07)', border: '1px solid rgba(201,168,76,0.15)', color: 'rgba(201,168,76,0.8)' }}>
                                 Reset
                             </button>
                         </div>
@@ -305,10 +305,10 @@ export default function FinanceCalculator({
                     {/* Balloon */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em]"
-                                style={{ color: 'rgba(240,237,232,0.35)' }}>Balloon Payment</p>
+                            <p className="text-[11px] font-black uppercase tracking-[0.2em]"
+                                style={{ color: 'rgba(240,237,232,0.62)' }}>Balloon Payment</p>
                             {balloonPct > 0 && (
-                                <span className="text-[10px] font-bold" style={{ color: '#F87171' }}>
+                                <span className="text-[12px] font-bold" style={{ color: '#F87171' }}>
                                     ⚠ {fmt(result.balloonAmount)} due at end
                                 </span>
                             )}
@@ -322,7 +322,7 @@ export default function FinanceCalculator({
                     style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div>
                         <p className="text-xs font-bold text-white/70">Include Credit Life Insurance</p>
-                        <p className="text-[10px]" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                        <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                             ≈ {fmt(result.insurance)}/month estimate
                         </p>
                     </div>
@@ -337,25 +337,17 @@ export default function FinanceCalculator({
                 <div className="h-px" style={{ background: 'rgba(201,168,76,0.08)' }} />
 
                 {/* ══ RESULT PANEL ══ */}
-                <div className="rounded-2xl p-6 relative overflow-hidden"
-                    style={{
-                        background: 'linear-gradient(135deg, #070C1A 0%, #0D1F3C 100%)',
-                        border: '1px solid rgba(201,168,76,0.25)',
-                        boxShadow: '0 0 60px rgba(201,168,76,0.04)',
-                    }}>
+                {/* Result: a gold-ruled section of the calculator card, not a card nested inside it */}
+                <div className="relative pt-6">
                     {/* Top shine */}
                     <div className="absolute top-0 left-0 right-0 h-px"
                         style={{ background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent)' }} />
 
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-1"
-                        style={{ color: 'rgba(201,168,76,0.45)' }}>
-                        Estimated Monthly Repayment
-                    </p>
                     <div className="flex items-end gap-3 mb-5">
-                        <h2 className="font-outfit font-black text-5xl text-white">
+                        <p className="font-outfit font-black text-5xl text-white tabular-nums" aria-label={`Estimated monthly repayment R${result.monthly.toLocaleString('en-ZA')}`}>
                             R{result.monthly.toLocaleString('en-ZA')}
-                        </h2>
-                        <span className="text-sm mb-2" style={{ color: 'rgba(240,237,232,0.3)' }}>/month</span>
+                        </p>
+                        <span className="text-sm mb-2" style={{ color: 'rgba(240,237,232,0.62)' }}>per month, estimated</span>
                     </div>
 
                     {/* Monthly breakdown */}
@@ -367,8 +359,8 @@ export default function FinanceCalculator({
                         ].map(({ label, value }) => (
                             <div key={label} className="p-2 rounded-xl text-center"
                                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <p className="text-[9px] font-bold uppercase tracking-widest mb-1"
-                                    style={{ color: 'rgba(240,237,232,0.3)' }}>{label}</p>
+                                <p className="text-[11px] font-bold uppercase tracking-widest mb-1"
+                                    style={{ color: 'rgba(240,237,232,0.62)' }}>{label}</p>
                                 <p className="text-xs font-black text-white">R{value.toLocaleString('en-ZA')}</p>
                             </div>
                         ))}
@@ -378,16 +370,16 @@ export default function FinanceCalculator({
                     <div className="grid grid-cols-2 gap-3">
                         <div className="rounded-xl p-3"
                             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <p className="text-[9px] font-bold uppercase tracking-widest mb-1"
-                                style={{ color: 'rgba(240,237,232,0.3)' }}>Total Repayable</p>
+                            <p className="text-[11px] font-bold uppercase tracking-widest mb-1"
+                                style={{ color: 'rgba(240,237,232,0.62)' }}>Total Repayable</p>
                             <p className="font-outfit font-bold text-base text-white">
                                 R{result.totalRepayable.toLocaleString('en-ZA')}
                             </p>
                         </div>
                         <div className="rounded-xl p-3"
                             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <p className="text-[9px] font-bold uppercase tracking-widest mb-1"
-                                style={{ color: 'rgba(240,237,232,0.3)' }}>Total Interest</p>
+                            <p className="text-[11px] font-bold uppercase tracking-widest mb-1"
+                                style={{ color: 'rgba(240,237,232,0.62)' }}>Total Interest</p>
                             <p className="font-outfit font-bold text-base" style={{ color: '#F87171' }}>
                                 R{result.totalInterest.toLocaleString('en-ZA')}
                             </p>
@@ -398,7 +390,7 @@ export default function FinanceCalculator({
                     <div className="flex items-center gap-2 mt-4 px-3 py-2 rounded-xl w-fit"
                         style={{ background: 'rgba(59,127,245,0.08)', border: '1px solid rgba(59,127,245,0.15)' }}>
                         <Percent size={11} style={{ color: '#60A5FA' }} />
-                        <p className="text-[10px] font-bold" style={{ color: 'rgba(240,237,232,0.5)' }}>
+                        <p className="text-[12px] font-bold" style={{ color: 'rgba(240,237,232,0.62)' }}>
                             APR <span className="text-white">{result.apr}%</span> · Prime {SA_RATES.prime}% + {Math.round((rate - SA_RATES.prime) * 10) / 10}% · Subject to bank approval
                         </p>
                     </div>
@@ -412,7 +404,7 @@ export default function FinanceCalculator({
                             <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
                             <div>
                                 <p className="text-xs font-black text-red-400 mb-1">Balloon Payment Warning</p>
-                                <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(248,113,113,0.7)' }}>
+                                <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(248,113,113,0.7)' }}>
                                     A lump sum of <strong>{fmt(result.balloonAmount)}</strong> is due at the end of Month {term}.
                                     This is NOT included in your monthly payment and must be settled in full, refinanced, or the vehicle must be sold.
                                     Balloon loans carry higher total cost of credit.
@@ -426,8 +418,8 @@ export default function FinanceCalculator({
                 {!compact && (
                     <div>
                         <button onClick={() => setShowNCA(p => !p)}
-                            className="flex items-center gap-2 w-full text-[10px] font-black uppercase tracking-widest mb-3 hover:opacity-70 transition-opacity"
-                            style={{ color: 'rgba(240,237,232,0.3)' }}>
+                            className="flex items-center gap-2 w-full text-[11px] font-black uppercase tracking-widest mb-3 hover:opacity-70 transition-opacity"
+                            style={{ color: 'rgba(240,237,232,0.62)' }}>
                             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
                             <span className="flex-shrink-0 flex items-center gap-1.5">
                                 <ShieldCheck size={10} />
@@ -438,13 +430,12 @@ export default function FinanceCalculator({
                         </button>
 
                         {showNCA && (
-                            <div className="rounded-2xl overflow-hidden"
-                                style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                                 <div className="px-4 py-3"
                                     style={{ background: 'rgba(74,222,128,0.05)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck size={12} style={{ color: '#4ADE80' }} />
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: '#4ADE80' }}>
+                                        <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: '#4ADE80' }}>
                                             NCA Section 92 — Pre-Agreement Cost of Credit
                                         </p>
                                     </div>
@@ -464,7 +455,7 @@ export default function FinanceCalculator({
                                             style={{ background: bold ? 'rgba(201,168,76,0.04)' : 'transparent' }}>
                                             <div>
                                                 <p className={`text-xs ${bold ? 'font-black text-white' : 'text-white/70'}`}>{label}</p>
-                                                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(240,237,232,0.25)' }}>{note}</p>
+                                                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(240,237,232,0.62)' }}>{note}</p>
                                             </div>
                                             <span className={`text-sm flex-shrink-0 ${bold ? 'font-black text-white' : warn ? 'font-bold text-red-400' : 'font-bold text-white/70'}`}>
                                                 {value}
@@ -472,8 +463,8 @@ export default function FinanceCalculator({
                                         </div>
                                     ))}
                                 </div>
-                                <div className="px-4 py-3 text-[9px] leading-relaxed"
-                                    style={{ background: 'rgba(255,255,255,0.02)', color: 'rgba(240,237,232,0.25)' }}>
+                                <div className="px-4 py-3 text-[12px] leading-relaxed max-w-[60ch]"
+                                    style={{ background: 'rgba(255,255,255,0.02)', color: 'rgba(240,237,232,0.62)' }}>
                                     This disclosure is provided in terms of Section 92 of the National Credit Act 34 of 2005. APR: {result.apr}%.
                                     These figures are estimates only and do not constitute a credit offer. Actual rates subject to FICA, credit check, and bank approval.
                                     National Credit Regulator registration number on file.
@@ -487,23 +478,23 @@ export default function FinanceCalculator({
                 {!compact && (
                     <div>
                         <button onClick={() => setShowFeeBreakdown(p => !p)}
-                            className="flex items-center gap-2 text-[10px] text-white/20 hover:text-white/40 transition-colors">
+                            className="flex items-center gap-2 text-[12px] text-white/58 hover:text-white/58 transition-colors">
                             <Info size={11} />
                             {showFeeBreakdown ? 'Hide' : 'Show'} fee details (NCA-regulated)
                             <ChevronDown size={10} style={{ transform: showFeeBreakdown ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                         </button>
                         {showFeeBreakdown && (
-                            <div className="mt-3 p-4 rounded-xl space-y-2 text-[11px]"
+                            <div className="mt-3 p-4 rounded-xl space-y-2 text-[12px]"
                                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div className="flex justify-between"><span className="text-white/40">Initiation fee (ex VAT)</span><span className="text-white/60">R 1,207.50</span></div>
-                                <div className="flex justify-between"><span className="text-white/40">VAT at 15%</span><span className="text-white/60">R 181.13</span></div>
-                                <div className="flex justify-between font-bold"><span className="text-white/60">Total Initiation (incl. VAT)</span><span className="text-white">R 1,388.63</span></div>
+                                <div className="flex justify-between"><span className="text-white/58">Initiation fee (ex VAT)</span><span className="text-white/66">R 1,207.50</span></div>
+                                <div className="flex justify-between"><span className="text-white/58">VAT at 15%</span><span className="text-white/66">R 181.13</span></div>
+                                <div className="flex justify-between font-bold"><span className="text-white/66">Total Initiation (incl. VAT)</span><span className="text-white">R 1,388.63</span></div>
                                 <div className="h-px my-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                                <div className="flex justify-between"><span className="text-white/40">Monthly service fee (ex VAT)</span><span className="text-white/60">R 69.00</span></div>
-                                <div className="flex justify-between"><span className="text-white/40">VAT at 15%</span><span className="text-white/60">R 10.35</span></div>
-                                <div className="flex justify-between font-bold"><span className="text-white/60">Monthly service (incl. VAT)</span><span className="text-white">R 79.35</span></div>
+                                <div className="flex justify-between"><span className="text-white/58">Monthly service fee (ex VAT)</span><span className="text-white/66">R 69.00</span></div>
+                                <div className="flex justify-between"><span className="text-white/58">VAT at 15%</span><span className="text-white/66">R 10.35</span></div>
+                                <div className="flex justify-between font-bold"><span className="text-white/66">Monthly service (incl. VAT)</span><span className="text-white">R 79.35</span></div>
                                 <div className="h-px my-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                                <p className="text-[10px] text-white/20">Fees are regulated by the National Credit Act and may not be altered by the dealership.</p>
+                                <p className="text-[12px] text-white/58">Fees are regulated by the National Credit Act and may not be altered by the dealership.</p>
                             </div>
                         )}
                     </div>
@@ -516,7 +507,7 @@ export default function FinanceCalculator({
                     style={{
                         background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
                         color: '#0A0F1E',
-                        boxShadow: '0 8px 32px rgba(201,168,76,0.2)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(201,168,76,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(201,168,76,0.2)'; e.currentTarget.style.transform = 'none'; }}>
@@ -529,17 +520,17 @@ export default function FinanceCalculator({
                     <div className="p-4 rounded-xl"
                         style={{ background: 'rgba(59,127,245,0.05)', border: '1px solid rgba(59,127,245,0.12)' }}>
                         <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(96,165,250,0.7)' }}>
+                            <p className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#60A5FA' }}>
                                 Embed on Your Website
                             </p>
                             <button onClick={handleCopyEmbed}
-                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all"
+                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-bold transition-all"
                                 style={{ background: 'rgba(59,127,245,0.12)', color: '#60A5FA' }}>
                                 {copied ? <><Check size={11} /> Copied!</> : <><Copy size={11} /> Copy Snippet</>}
                             </button>
                         </div>
-                        <pre className="text-[9px] leading-relaxed overflow-x-auto rounded-lg p-2"
-                            style={{ background: 'rgba(0,0,0,0.3)', color: 'rgba(240,237,232,0.35)', fontFamily: 'monospace' }}>
+                        <pre className="text-[12px] leading-relaxed overflow-x-auto rounded-lg p-2"
+                            style={{ background: 'rgba(0,0,0,0.3)', color: 'rgba(240,237,232,0.62)', fontFamily: 'monospace' }}>
                             {`<div id="ka-finance-widget"></div>
 <script src="https://api.kenganauto.co.za/
   public/finance-widget.js"

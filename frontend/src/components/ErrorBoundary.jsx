@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -8,7 +7,7 @@ export class ErrorBoundary extends React.Component {
         this.state = { hasError: false, error: null, errorInfo: null };
     }
 
-    static getDerivedStateFromError(error) {
+    static getDerivedStateFromError(_error) {
         return { hasError: true };
     }
 
@@ -32,7 +31,7 @@ export class ErrorBoundary extends React.Component {
                         Something went wrong
                     </h1>
 
-                    <p className="max-w-md text-sm leading-relaxed mb-8" style={{ color: 'rgba(240,237,232,0.5)' }}>
+                    <p className="max-w-md text-sm leading-relaxed mb-8" style={{ color: 'rgba(240,237,232,0.62)' }}>
                         We encountered an unexpected error while trying to load this view. Please try refreshing the page. If the issue persists, contact support.
                     </p>
 
@@ -43,16 +42,17 @@ export class ErrorBoundary extends React.Component {
                         >
                             <RefreshCw size={16} /> Reload Page
                         </button>
-                        <Link
-                            to="/"
+                        {/* Plain anchor: this boundary renders outside <Router>, so a router <Link> would crash the fallback itself */}
+                        <a
+                            href="/dashboard"
                             className="py-3 px-6 rounded-xl flex items-center gap-2 font-bold transition-all"
                             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
                         >
                             <Home size={16} /> Dashboard
-                        </Link>
+                        </a>
                     </div>
 
-                    {process.env.NODE_ENV === 'development' && this.state.error && (
+                    {import.meta.env.DEV && this.state.error && (
                         <div className="mt-12 p-4 rounded-xl text-left bg-black/50 border border-white/10 w-full max-w-2xl overflow-auto text-xs font-mono text-red-300">
                             <p className="font-bold mb-2">{this.state.error.toString()}</p>
                             <pre>{this.state.errorInfo?.componentStack}</pre>

@@ -30,17 +30,33 @@ router.post('/', async (req, res) => {
 
                 // If this is a subscription creation/upgrade
                 if (session.mode === 'subscription') {
-                    const tenantId = session.subscription_data?.metadata?.tenant_id;
-                    const planKey = session.subscription_data?.metadata?.plan;
+                    // Metadata is set at the session level (not subscription_data which is the input)
+                    // We also fetch the subscription to get its metadata as a fallback
+                    let tenantId = session.metadata?.tenant_id;
+                    let planKey = session.metadata?.plan;
+
+                    // Fallback: retrieve subscription metadata if not on session
+                    if (!tenantId && session.subscription) {
+                        try {
+                            const sub = await stripe.subscriptions.retrieve(session.subscription);
+                            tenantId = sub.metadata?.tenant_id;
+                            planKey = sub.metadata?.plan;
+                        } catch (subErr) {
+                            console.error('[stripe-webhook] Could not retrieve subscription:', subErr.message);
+                        }
+                    }
 
                     if (tenantId) {
-                        await Knex('tenants').where({ id: tenantId }).update({
+                        await Knex('tenants').where({ id: Number(tenantId) }).update({
                             stripe_customer_id: session.customer,
                             stripe_subscription_id: session.subscription,
-                            plan: planKey,
-                            setup_fee_paid: true, // Assuming checkout collected it
+                            plan: planKey || 'starter',
+                            setup_fee_paid: true,
+                            subscription_status: 'active',
                         });
                         console.log(`[stripe-webhook] Tenant ${tenantId} subscribed to ${planKey}`);
+                    } else {
+                        console.warn('[stripe-webhook] checkout.session.completed missing tenant_id in metadata');
                     }
                 }
                 break;

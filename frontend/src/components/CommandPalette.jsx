@@ -7,6 +7,12 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function CommandPalette() {
+    const quickLinks = [
+        { id: 'nav-1', type: 'page', title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+        { id: 'nav-2', type: 'page', title: 'Leads Pipeline', url: '/leads', icon: Users },
+        { id: 'nav-3', type: 'page', title: 'Inventory Stock', url: '/stock', icon: Car },
+        { id: 'nav-4', type: 'page', title: 'WhatsApp Settings', url: '/settings/whatsapp', icon: Settings },
+    ];
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -15,12 +21,25 @@ export default function CommandPalette() {
     const navigate = useNavigate();
     const { token } = useAuth();
 
+    const togglePalette = () => {
+        setIsOpen(prev => {
+            const nextOpen = !prev;
+            if (nextOpen) {
+                setQuery('');
+                setResults(quickLinks);
+                setSelectedIndex(0);
+                setTimeout(() => inputRef.current?.focus(), 100);
+            }
+            return nextOpen;
+        });
+    };
+
     // Setup Keyboard Listener
     useEffect(() => {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                setIsOpen(prev => !prev);
+                togglePalette();
             }
             if (e.key === 'Escape') setIsOpen(false);
         };
@@ -28,28 +47,13 @@ export default function CommandPalette() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Focus input on open
-    useEffect(() => {
-        if (isOpen && inputRef.current) {
-            setTimeout(() => inputRef.current.focus(), 100);
-            setQuery('');
-            setResults([]);
-            setSelectedIndex(0);
-        }
-    }, [isOpen]);
-
     // Handle Search Queries
     useEffect(() => {
         if (!isOpen) return;
         const debounce = setTimeout(async () => {
             if (query.trim().length < 2) {
                 // Return quick links if no query
-                setResults([
-                    { id: 'nav-1', type: 'page', title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-                    { id: 'nav-2', type: 'page', title: 'Leads Pipeline', url: '/leads', icon: Users },
-                    { id: 'nav-3', type: 'page', title: 'Inventory Stock', url: '/stock', icon: Car },
-                    { id: 'nav-4', type: 'page', title: 'WhatsApp Settings', url: '/settings/whatsapp', icon: Settings },
-                ]);
+                setResults(quickLinks);
                 return;
             }
 
@@ -132,19 +136,19 @@ export default function CommandPalette() {
                         placeholder="Search leads, vehicles, customers..."
                         className="w-full bg-transparent border-none outline-none text-white text-lg px-4 font-outfit"
                     />
-                    <div className="text-[10px] uppercase font-bold text-white/30 border border-white/10 px-2 py-1 rounded-md shrink-0 focus-within:hidden">ESC</div>
+                    <div className="text-[11px] uppercase font-bold text-white/58 border border-white/10 px-2 py-1 rounded-md shrink-0 focus-within:hidden">ESC</div>
                 </div>
 
                 {/* Results List */}
                 <div className="max-h-[50vh] overflow-y-auto p-2">
                     {results.length === 0 ? (
                         <div className="py-12 flex items-center justify-center">
-                            <p className="text-white/40 text-sm">{query.length > 1 ? "No results found." : "Type to start searching..."}</p>
+                            <p className="text-white/58 text-sm">{query.length > 1 ? "No results found." : "Type to start searching..."}</p>
                         </div>
                     ) : (
                         results.map((item, idx) => {
                             const Icon = item.icon;
-                            let colorClass = 'text-white/60';
+                            let colorClass = 'text-white/66';
                             let bgClass = 'bg-white/5';
                             if (item.type === 'page') { colorClass = 'text-blue-400'; bgClass = 'bg-blue-400/10'; }
                             if (item.type === 'lead') { colorClass = 'text-green-400'; bgClass = 'bg-green-400/10'; }
@@ -166,9 +170,9 @@ export default function CommandPalette() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-bold text-sm text-white truncate">{item.title}</p>
-                                        {item.subtitle && <p className="text-xs text-white/40 truncate">{item.subtitle}</p>}
+                                        {item.subtitle && <p className="text-xs text-white/58 truncate">{item.subtitle}</p>}
                                     </div>
-                                    {idx === selectedIndex && <div className="text-[10px] text-[#C9A84C]/60 uppercase tracking-widest font-black shrink-0">Return ⏎</div>}
+                                    {idx === selectedIndex && <div className="text-[11px] text-[#C9A84C]/80 uppercase tracking-widest font-black shrink-0">Return ⏎</div>}
                                 </button>
                             );
                         })
@@ -178,12 +182,12 @@ export default function CommandPalette() {
                 {/* Footer hints */}
                 <div className="bg-[#0A0F1E] border-t border-white/5 px-6 py-3 flex items-center gap-6 justify-between">
                     <div className="flex items-center gap-6">
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-2">
+                        <span className="text-[11px] uppercase tracking-widest font-bold text-white/58 flex items-center gap-2">
                             <span className="px-1.5 py-0.5 border border-white/10 rounded">↑</span>
                             <span className="px-1.5 py-0.5 border border-white/10 rounded">↓</span>
                             to navigate
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-white/30 flex items-center gap-2">
+                        <span className="text-[11px] uppercase tracking-widest font-bold text-white/58 flex items-center gap-2">
                             <span className="px-1.5 py-0.5 border border-white/10 rounded">⏎</span>
                             to select
                         </span>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Settings, Key, Globe, Layout, MessageCircle, BarChart, Server, CheckCircle, XCircle, Loader2, Sparkles, Smartphone, Mail, CreditCard, Facebook, MapPin, Database } from 'lucide-react';
+import { Shield, Key, Server, CheckCircle, XCircle, Loader2, Sparkles, Smartphone, Mail, CreditCard, Facebook, MapPin, Database, MessageCircle } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -24,11 +24,7 @@ export default function SuperAdminApiSettings() {
     const [form, setForm] = useState({});
     const [testing, setTesting] = useState({}); // Stores 'loading', 'success', 'fail' per service
 
-    useEffect(() => {
-        fetchSettings();
-    }, []);
-
-    const fetchSettings = async () => {
+    async function fetchSettings() {
         try {
             const res = await axios.get(`${API_BASE}/api/superadmin/api-settings`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -39,7 +35,11 @@ export default function SuperAdminApiSettings() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
 
     const handleTest = async (serviceName) => {
         const key = form[serviceName];
@@ -54,7 +54,7 @@ export default function SuperAdminApiSettings() {
             if (res.data.success) {
                 setTesting(prev => ({ ...prev, [serviceName]: 'success' }));
             }
-        } catch (err) {
+        } catch {
             setTesting(prev => ({ ...prev, [serviceName]: 'fail' }));
         }
     };
@@ -70,7 +70,7 @@ export default function SuperAdminApiSettings() {
             );
             alert(`${serviceName} saved successfully.`);
             fetchSettings();
-        } catch (err) {
+        } catch {
             alert('Failed to save key.');
         }
     };
@@ -81,7 +81,6 @@ export default function SuperAdminApiSettings() {
         <div className="flex flex-col min-h-screen">
             <header className="px-8 py-5 flex-shrink-0 sticky top-0 z-40"
                 style={{ background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-0.5 text-[#C9A84C]">Vault Control</p>
                 <h1 className="font-outfit font-black text-xl text-white flex items-center gap-2">
                     <Key className="text-[#C9A84C]" size={20} /> Secure Service Integrations
                 </h1>
@@ -109,10 +108,10 @@ export default function SuperAdminApiSettings() {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-outfit font-black text-white">{srv.name}</h3>
-                                            <p className="text-[10px] text-white/40 leading-none mt-0.5">{srv.desc}</p>
+                                            <p className="text-[12px] text-white/58 leading-none mt-0.5">{srv.desc}</p>
                                         </div>
                                         {live.isConfigured && (
-                                            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-400/10 text-emerald-400 text-[10px] font-black uppercase">
+                                            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-400/10 text-emerald-400 text-[11px] font-black uppercase">
                                                 <CheckCircle size={10} /> Active
                                             </div>
                                         )}

@@ -37,7 +37,7 @@ const INTENT_META = {
 const IntentBadge = ({ intent }) => {
     const m = INTENT_META[intent] || { color: '#94A3B8', label: intent, emoji: '•' };
     return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full"
+        <span className="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-widest px-2 py-1 rounded-full"
             style={{ background: `${m.color}15`, color: m.color, border: `1px solid ${m.color}25` }}>
             {m.emoji} {m.label}
         </span>
@@ -55,7 +55,7 @@ const MetricCard = ({ label, value, color, emoji }) => (
     <div className="rounded-2xl p-5 flex items-center justify-between"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(240,237,232,0.35)' }}>{label}</p>
+            <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(240,237,232,0.62)' }}>{label}</p>
             <p className="font-outfit font-black text-2xl" style={{ color }}>{value}</p>
         </div>
         <span className="text-3xl">{emoji}</span>
@@ -106,7 +106,9 @@ const Chatbot = () => {
                 const data = await res.json();
                 setNotifications(data.notifications || []);
             }
-        } catch { }
+        } catch {
+            setNotifications([]);
+        }
     }, [token]);
 
     /* ── Polling ── */
@@ -172,15 +174,14 @@ const Chatbot = () => {
                 style={{ background: 'rgba(10,15,30,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>Module</p>
                         <h1 className="font-outfit font-black text-xl text-white">AI Conversations Hub</h1>
                     </div>
 
                     <div className="flex items-center gap-3">
                         {/* Live indicator */}
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold cursor-pointer"
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-bold cursor-pointer"
                             onClick={() => setPolling(p => !p)}
-                            style={{ background: polling ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.04)', color: polling ? '#4ADE80' : 'rgba(240,237,232,0.3)', border: `1px solid ${polling ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.08)'}` }}>
+                            style={{ background: polling ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.04)', color: polling ? '#4ADE80' : 'rgba(240,237,232,0.66)', border: `1px solid ${polling ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.08)'}` }}>
                             <div className="w-1.5 h-1.5 rounded-full" style={{ background: polling ? '#4ADE80' : 'rgba(255,255,255,0.2)', boxShadow: polling ? '0 0 6px #4ADE80' : 'none', animation: polling ? 'pulse 2s infinite' : 'none' }} />
                             {polling ? 'Live' : 'Paused'}
                         </div>
@@ -189,9 +190,9 @@ const Chatbot = () => {
                         <button onClick={() => setShowNotifications(p => !p)}
                             className="relative p-2.5 rounded-xl transition-all"
                             style={{ background: unreadCount ? 'rgba(201,168,76,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${unreadCount ? 'rgba(201,168,76,0.25)' : 'rgba(255,255,255,0.08)'}` }}>
-                            {unreadCount ? <BellDot size={18} style={{ color: '#C9A84C' }} /> : <Bell size={18} style={{ color: 'rgba(240,237,232,0.4)' }} />}
+                            {unreadCount ? <BellDot size={18} style={{ color: '#C9A84C' }} /> : <Bell size={18} style={{ color: 'rgba(240,237,232,0.62)' }} />}
                             {unreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full text-[9px] font-black"
+                                <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full text-[12px] font-black"
                                     style={{ background: '#C9A84C', color: '#0A0F1E' }}>
                                     {unreadCount}
                                 </span>
@@ -200,7 +201,7 @@ const Chatbot = () => {
 
                         {/* Preview widget */}
                         <button onClick={() => setShowPreview(p => !p)}
-                            className="px-3 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 transition-all"
+                            className="px-3 py-2 rounded-xl text-[12px] font-bold flex items-center gap-2 transition-all"
                             style={{ background: 'rgba(59,127,245,0.1)', border: '1px solid rgba(59,127,245,0.2)', color: '#60A5FA' }}>
                             <Zap size={13} /> Preview Chat
                         </button>
@@ -210,14 +211,14 @@ const Chatbot = () => {
                             <button onClick={() => setShowSettings(p => !p)}
                                 className="p-2.5 rounded-xl transition-all"
                                 style={{ background: showSettings ? 'rgba(201,168,76,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showSettings ? 'rgba(201,168,76,0.25)' : 'rgba(255,255,255,0.08)'}` }}>
-                                <Settings size={18} style={{ color: showSettings ? '#C9A84C' : 'rgba(240,237,232,0.4)' }} />
+                                <Settings size={18} style={{ color: showSettings ? '#C9A84C' : 'rgba(240,237,232,0.66)' }} />
                             </button>
                         )}
 
                         <button onClick={fetchConversations}
                             className="p-2.5 rounded-xl transition-all"
                             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <RefreshCw size={16} style={{ color: 'rgba(240,237,232,0.4)' }} />
+                            <RefreshCw size={16} style={{ color: 'rgba(240,237,232,0.62)' }} />
                         </button>
                     </div>
                 </div>
@@ -239,7 +240,7 @@ const Chatbot = () => {
                         ].map(s => (
                             <div key={s.l} className="px-3 py-3 text-center" style={{ background: '#0A0F1E' }}>
                                 <p className="font-outfit font-black text-lg" style={{ color: s.c }}>{s.v}</p>
-                                <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.3)' }}>{s.l}</p>
+                                <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.62)' }}>{s.l}</p>
                             </div>
                         ))}
                     </div>
@@ -253,10 +254,10 @@ const Chatbot = () => {
                             return (
                                 <button key={k}
                                     onClick={() => setFilterIntent(k)}
-                                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 transition-all"
+                                    className="text-[11px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 transition-all"
                                     style={{
                                         background: active ? (m ? `${m.color}20` : 'rgba(201,168,76,0.15)') : 'rgba(255,255,255,0.04)',
-                                        color: active ? (m ? m.color : '#C9A84C') : 'rgba(240,237,232,0.3)',
+                                        color: active ? (m ? m.color : '#C9A84C') : 'rgba(240,237,232,0.66)',
                                         border: `1px solid ${active ? (m ? `${m.color}35` : 'rgba(201,168,76,0.3)') : 'rgba(255,255,255,0.07)'}`,
                                     }}>
                                     {k === 'ALL' ? '⬜ All' : `${m.emoji} ${m.label}`}
@@ -269,13 +270,13 @@ const Chatbot = () => {
                     <div className="flex-1 overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center justify-center h-40">
-                                <RefreshCw size={20} style={{ color: 'rgba(201,168,76,0.4)' }} className="animate-spin" />
+                                <RefreshCw size={20} style={{ color: 'rgba(201,168,76,0.8)' }} className="animate-spin" />
                             </div>
                         ) : filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-48 text-center px-6">
-                                <MessageSquare size={32} style={{ color: 'rgba(201,168,76,0.15)' }} className="mb-3" />
-                                <p className="text-sm font-bold" style={{ color: 'rgba(240,237,232,0.3)' }}>No conversations yet</p>
-                                <p className="text-[11px] mt-1" style={{ color: 'rgba(240,237,232,0.2)' }}>Open the chat widget to start a test conversation</p>
+                                <MessageSquare size={32} style={{ color: 'rgba(201,168,76,0.8)' }} className="mb-3" />
+                                <p className="text-sm font-bold" style={{ color: 'rgba(240,237,232,0.62)' }}>No conversations yet</p>
+                                <p className="text-[12px] mt-1" style={{ color: 'rgba(240,237,232,0.62)' }}>Open the chat widget to start a test conversation</p>
                             </div>
                         ) : (
                             filtered.map(conv => (
@@ -296,7 +297,7 @@ const Chatbot = () => {
                                                 <p className="text-sm font-bold text-white leading-none truncate">
                                                     {conv.lead?.customer_name || 'Anonymous Visitor'}
                                                 </p>
-                                                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(240,237,232,0.3)' }}>
+                                                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                                     {conv.message_count} messages · {conv.channel}
                                                 </p>
                                             </div>
@@ -304,13 +305,13 @@ const Chatbot = () => {
                                         <SentimentIcon score={conv.sentiment} />
                                     </div>
 
-                                    <p className="text-[11px] mb-2 line-clamp-2 leading-relaxed" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                                    <p className="text-[12px] mb-2 line-clamp-2 leading-relaxed" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                         {conv.last_message || '—'}
                                     </p>
 
                                     <div className="flex items-center justify-between">
                                         <IntentBadge intent={conv.intent} />
-                                        <span className="text-[9px]" style={{ color: 'rgba(240,237,232,0.2)' }}>
+                                        <span className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                             {new Date(conv.updated_at).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
@@ -332,7 +333,7 @@ const Chatbot = () => {
                                     💬
                                 </div>
                                 <p className="font-outfit font-black text-xl text-white mb-2">Select a conversation</p>
-                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.35)' }}>
+                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     Click any conversation to view the full transcript and lead details.
                                 </p>
                             </div>
@@ -351,13 +352,13 @@ const Chatbot = () => {
                             style={{ background: 'rgba(10,15,30,0.95)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                             <h3 className="font-outfit font-black text-base text-white">Alerts</h3>
                             <button onClick={() => setShowNotifications(false)}>
-                                <X size={16} style={{ color: 'rgba(240,237,232,0.4)' }} />
+                                <X size={16} style={{ color: 'rgba(240,237,232,0.62)' }} />
                             </button>
                         </div>
                         {notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-48 text-center px-6">
                                 <CheckCircle2 size={28} style={{ color: 'rgba(74,222,128,0.3)' }} className="mb-3" />
-                                <p className="text-sm font-bold" style={{ color: 'rgba(240,237,232,0.3)' }}>All clear!</p>
+                                <p className="text-sm font-bold" style={{ color: 'rgba(240,237,232,0.62)' }}>All clear!</p>
                             </div>
                         ) : notifications.map(n => (
                             <div key={n.id} className="px-6 py-4 border-b flex gap-3 items-start"
@@ -366,13 +367,13 @@ const Chatbot = () => {
                                     {n.type === 'HUMAN_HANDOFF' ? '🚨' : n.type === 'TEST_DRIVE_BOOKED' ? '🔑' : n.type === 'SERVICE_BOOKED' ? '🔧' : '🎯'}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-bold text-white mb-1">{n.type.replace(/_/g, ' ')}</p>
-                                    <p className="text-[10px] leading-relaxed whitespace-pre-line" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                                    <p className="text-[12px] font-bold text-white mb-1">{n.type.replace(/_/g, ' ')}</p>
+                                    <p className="text-[12px] leading-relaxed whitespace-pre-line" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                         {n.message.slice(0, 200)}
                                     </p>
                                     <button onClick={() => markRead(n.id)}
-                                        className="mt-2 text-[9px] font-bold px-2 py-1 rounded-full"
-                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(240,237,232,0.4)' }}>
+                                        className="mt-2 text-[12px] font-bold px-2 py-1 rounded-full"
+                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(240,237,232,0.62)' }}>
                                         Mark read
                                     </button>
                                 </div>
@@ -391,20 +392,20 @@ const Chatbot = () => {
                         <div className="flex items-center justify-between">
                             <h3 className="font-outfit font-black text-base text-white">AI Settings</h3>
                             <button onClick={() => setShowSettings(false)}>
-                                <X size={16} style={{ color: 'rgba(240,237,232,0.4)' }} />
+                                <X size={16} style={{ color: 'rgba(240,237,232,0.62)' }} />
                             </button>
                         </div>
 
                         <div className="space-y-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.5)' }}>
+                            <p className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.8)' }}>
                                 Anthropic API Key
                             </p>
-                            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                            <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 Enter your claude API key from <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" className="underline" style={{ color: '#60A5FA' }}>console.anthropic.com</a>.
                                 The chatbot will start using real Claude responses immediately.
                             </p>
                             <div className="relative">
-                                <Key className="absolute left-4 top-1/2 -translate-y-1/2" size={15} style={{ color: 'rgba(201,168,76,0.4)' }} />
+                                <Key className="absolute left-4 top-1/2 -translate-y-1/2" size={15} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                 <input
                                     type={showApiKey ? 'text' : 'password'}
                                     value={apiKey}
@@ -414,7 +415,7 @@ const Chatbot = () => {
                                 />
                                 <button type="button" onClick={() => setShowApiKey(p => !p)}
                                     className="absolute right-4 top-1/2 -translate-y-1/2"
-                                    style={{ color: 'rgba(240,237,232,0.25)' }}>
+                                    style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     {showApiKey ? <EyeOff size={15} /> : <Eye size={15} />}
                                 </button>
                             </div>
@@ -425,19 +426,19 @@ const Chatbot = () => {
                                 {savingKey ? 'Saving…' : 'Activate Key'}
                             </button>
                             {saveMsg && (
-                                <p className="text-[11px] text-center font-bold" style={{ color: saveMsg.startsWith('✓') ? '#4ADE80' : '#F87171' }}>
+                                <p className="text-[12px] text-center font-bold" style={{ color: saveMsg.startsWith('✓') ? '#4ADE80' : '#F87171' }}>
                                     {saveMsg}
                                 </p>
                             )}
                         </div>
 
                         <div className="pt-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.3)' }}>
+                            <p className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 Model
                             </p>
                             <div className="px-4 py-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
                                 <p className="text-sm font-bold text-white">claude-sonnet-4-5</p>
-                                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(240,237,232,0.35)' }}>Latest Claude model — intent + conversation</p>
+                                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(240,237,232,0.62)' }}>Latest Claude model — intent + conversation</p>
                             </div>
                         </div>
                     </div>
@@ -450,9 +451,9 @@ const Chatbot = () => {
                     <div className="h-full flex flex-col">
                         <div className="flex items-center justify-between px-4 py-2 flex-shrink-0"
                             style={{ background: 'rgba(6,10,20,0.9)', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
-                            <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.5)' }}>Live Preview</span>
+                            <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.8)' }}>Live Preview</span>
                             <button onClick={() => setShowPreview(false)}>
-                                <X size={14} style={{ color: 'rgba(240,237,232,0.4)' }} />
+                                <X size={14} style={{ color: 'rgba(240,237,232,0.62)' }} />
                             </button>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -493,7 +494,7 @@ const ConversationDetail = ({ conv, token }) => {
                             </p>
                             <div className="flex items-center gap-3 mt-1">
                                 <IntentBadge intent={display.intent} />
-                                <span className="text-[10px]" style={{ color: 'rgba(240,237,232,0.3)' }}>
+                                <span className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     {display.channel} · {display.message_count || (display.messages?.length)} messages
                                 </span>
                             </div>
@@ -516,9 +517,9 @@ const ConversationDetail = ({ conv, token }) => {
                                 <div className="flex items-center gap-2 mb-1.5">
                                     {msg.role === 'user'
                                         ? <User size={11} style={{ color: '#C9A84C' }} />
-                                        : <div className="text-[10px] font-bold" style={{ color: 'rgba(201,168,76,0.6)' }}>Kengan AI</div>
+                                        : <div className="text-[12px] font-bold" style={{ color: 'rgba(201,168,76,0.8)' }}>Kengan AI</div>
                                     }
-                                    <span className="text-[9px]" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                                    <span className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                         {new Date(msg.timestamp).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
@@ -527,7 +528,7 @@ const ConversationDetail = ({ conv, token }) => {
                         </div>
                     ))}
                     {(!fullConv?.messages || fullConv.messages.length === 0) && (
-                        <div className="text-center py-12" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                        <div className="text-center py-12" style={{ color: 'rgba(240,237,232,0.62)' }}>
                             <p className="text-sm">Loading conversation…</p>
                         </div>
                     )}
@@ -538,7 +539,7 @@ const ConversationDetail = ({ conv, token }) => {
             <div className="w-64 flex-shrink-0 border-l overflow-y-auto px-6 py-6 space-y-6"
                 style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'rgba(201,168,76,0.4)' }}>Lead Details</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: 'rgba(201,168,76,0.8)' }}>Lead Details</p>
                     {[
                         [<User size={12} />, display.lead?.customer_name || '—'],
                         [<Phone size={12} />, display.lead?.customer_phone || '—'],
@@ -547,14 +548,14 @@ const ConversationDetail = ({ conv, token }) => {
                     ].map(([icon, val], i) => (
                         <div key={i} className="flex items-center gap-2.5 py-2.5"
                             style={{ borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                            <span style={{ color: 'rgba(201,168,76,0.4)' }}>{icon}</span>
-                            <span className="text-[11px] font-medium" style={{ color: 'rgba(240,237,232,0.6)' }}>{val}</span>
+                            <span style={{ color: 'rgba(201,168,76,0.8)' }}>{icon}</span>
+                            <span className="text-[12px] font-medium" style={{ color: 'rgba(240,237,232,0.6)' }}>{val}</span>
                         </div>
                     ))}
                 </div>
 
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'rgba(240,237,232,0.3)' }}>Conversation</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: 'rgba(240,237,232,0.62)' }}>Conversation</p>
                     {[
                         ['ID', (display.id || '').slice(-8)],
                         ['Channel', display.channel || '—'],
@@ -564,8 +565,8 @@ const ConversationDetail = ({ conv, token }) => {
                     ].map(([k, v], i) => (
                         <div key={i} className="flex justify-between py-2"
                             style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                            <span className="text-[10px]" style={{ color: 'rgba(240,237,232,0.3)' }}>{k}</span>
-                            <span className="text-[10px] font-bold" style={{ color: 'rgba(240,237,232,0.7)' }}>{v}</span>
+                            <span className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>{k}</span>
+                            <span className="text-[12px] font-bold" style={{ color: 'rgba(240,237,232,0.7)' }}>{v}</span>
                         </div>
                     ))}
                 </div>

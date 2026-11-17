@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 // Auth
 import { AuthProvider } from './context/AuthContext';
@@ -8,6 +9,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import TermsAndConditions from './pages/legal/TermsAndConditions';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import POPIACompliance from './pages/legal/POPIACompliance';
 
 // Layout
 import Sidebar from './components/Sidebar';
@@ -18,6 +22,7 @@ import Chatbot from './pages/Chatbot';
 import WhatsappSettings from './pages/WhatsappSettings';
 import WidgetSettings from './pages/WidgetSettings';
 import LeadsPage from './pages/Leads';
+import ActionQueue from './pages/ActionQueue';
 import TradeIns from './pages/TradeIns';
 import Stock from './pages/Stock';
 import Service from './pages/Service';
@@ -34,106 +39,111 @@ import SuperAdmin from './pages/SuperAdmin';
 import SuperAdminApiSettings from './pages/SuperAdminApiSettings';
 import Onboarding from './pages/Onboarding';
 import Help from './pages/Help';
+import CustomerCare from './pages/CustomerCare';
+import Targets from './pages/Targets';
+import AIImpact from './pages/AIImpact';
+import OnlineDeals from './pages/OnlineDeals';
+import PublicVehicle from './pages/PublicVehicle';
 import { useAuth } from './context/AuthContext';
 import { Menu, X } from 'lucide-react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import CommandPalette from './components/CommandPalette';
+import LiveLeadToast from './components/LiveLeadToast';
+
+/* ── Per-route content transition (keeps sidebar static) ── */
+const RouteTransition = ({ children }) => {
+  const location = useLocation();
+  const reduce = useReducedMotion();
+  if (reduce) return <div className="flex-1 min-h-0">{children}</div>;
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        className="flex-1 min-h-0"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.32, ease: [0.2, 0.7, 0.3, 1] }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 /* ── App Layout Shell ── */
 const AppLayout = ({ children }) => {
   const { user } = useAuth();
   const isDemo = user?.tenant_id === 9999 || window.location.host.includes('demo');
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(() => {
+    if (typeof window === 'undefined') return true;
+    const saved = window.localStorage.getItem('ka_sidebar_open');
+    return saved === null ? true : saved === 'true';
+  });
+
+  React.useEffect(() => {
+    window.localStorage.setItem('ka_sidebar_open', String(sidebarOpen));
+  }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#0A0F1E' }}>
-      {/* Mobile Hamburger Button */}
+    <div className="flex h-screen overflow-hidden bg-[#0A0F1E]">
       {user && (
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden fixed z-[60] top-5 left-5 p-2 bg-[#111A30] border border-[#C9A84C]/20 rounded-lg text-[#C9A84C] shadow-lg shadow-black/50"
+          className={`fixed z-[60] top-5 p-2.5 bg-[#111A30]/92 backdrop-blur-md border border-[#C9A84C]/30 rounded-xl text-[#C9A84C] shadow-[0_10px_40px_rgba(0,0,0,0.8)] hover:bg-[#C9A84C]/10 transition-all ${sidebarOpen ? 'left-5 md:left-[240px]' : 'left-5'}`}
+          aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       )}
 
-      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/60 z-[40] backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-[#0A0F1E]/80 z-[40] backdrop-blur-sm transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      <div className={`fixed inset-y-0 left-0 z-[50] transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}>
+      <div
+        className={`fixed inset-y-0 left-0 z-[50] transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[4px_0_24px_rgba(0,0,0,0.5)] md:relative md:shadow-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:w-0 md:min-w-0 md:overflow-hidden'}`}
+      >
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
-      <main className="flex-1 max-w-full overflow-x-hidden overflow-y-auto relative flex flex-col md:pl-0">
+      <main className={`flex-1 max-w-full overflow-x-hidden overflow-y-auto relative flex flex-col bg-[#0F172A] transition-[padding] duration-300 ${user && !sidebarOpen ? 'pl-16 md:pl-20' : ''}`}>
 
         {/* Persistent Demo Banner */}
         {isDemo && (
-          <div className="w-full bg-[#C9A84C]/10 border-b border-[#C9A84C]/20 px-8 py-3 flex items-center justify-between shrink-0 z-50">
+          <div className="w-full border-b border-white/8 bg-[#111A30] px-8 py-3 flex items-center justify-between shrink-0 z-50">
             <div className="flex items-center gap-3">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C9A84C] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C9A84C]"></span>
-              </span>
-              <p className="font-outfit font-bold text-[#C9A84C] text-sm uppercase tracking-wider mb-0">
-                Welcome to the Demo Environment
+              <span className="h-2.5 w-2.5 rounded-full bg-[#C9A84C]"></span>
+              <p className="font-outfit font-black text-[#C9A84C] text-sm uppercase tracking-widest mb-0">
+                Sandbox Environment
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <a href="https://calendly.com/kenganauto/demo" target="_blank" rel="noreferrer"
-                className="px-4 py-1.5 rounded-lg border border-[#C9A84C]/50 text-[#C9A84C] text-xs font-bold hover:bg-[#C9A84C]/10 transition-colors">
+                className="px-4 py-1.5 rounded-lg border border-white/12 text-white/80 text-xs font-bold hover:bg-white/5 hover:text-white transition-all">
                 Book a Demo Call
               </a>
-              <button onClick={() => window.location.href = '/register'} className="px-4 py-1.5 rounded-lg bg-[#C9A84C] text-[#0A0F1E] text-xs font-black hover:opacity-90 transition-opacity">
-                Start Your Free Trial
+              <button onClick={() => window.location.href = '/register'} className="px-5 py-1.5 rounded-lg bg-[#C9A84C] text-[#0A0F1E] text-xs font-black hover:opacity-90 transition-all">
+                Start Free Trial
               </button>
             </div>
           </div>
         )}
 
-        {children}
+        <RouteTransition>{children}</RouteTransition>
       </main>
 
       <CommandPalette />
+      {user && <LiveLeadToast />}
 
       {/* Global chat widget FAB — visible only when logged in */}
       {user && <ChatWidget tenantId={user.tenant_id} tenantName="KenganAuto" position="bottom-right" />}
     </div>
   );
 };
-
-/* ── Role-aware placeholder ── */
-const PagePlaceholder = ({ title, module }) => (
-  <AppLayout>
-    <ProtectedRoute module={module}>
-      <div className="flex flex-col min-h-screen">
-        <header className="px-8 py-5 flex-shrink-0 sticky top-0 z-40"
-          style={{ background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>Module</p>
-          <h1 className="font-outfit font-black text-xl text-white">{title}</h1>
-        </header>
-
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="text-center anim-fade-up max-w-md">
-            <div className="h-24 w-24 mx-auto mb-8 rounded-3xl flex items-center justify-center text-4xl"
-              style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.04))', border: '1px solid rgba(201,168,76,0.2)', boxShadow: '0 0 40px rgba(201,168,76,0.08)' }}>
-              🚧
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: 'rgba(201,168,76,0.5)' }}>Coming Soon</p>
-            <h2 className="font-outfit font-black text-2xl text-white mb-3">{title}</h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(240,237,232,0.35)', maxWidth: '30ch', margin: '0 auto' }}>
-              This module is being optimised for AI-driven performance and will be available shortly.
-            </p>
-          </div>
-        </div>
-      </div>
-    </ProtectedRoute>
-  </AppLayout>
-);
 
 /* ══════════════════════════════════════════ */
 function App() {
@@ -147,6 +157,11 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/legal/terms" element={<TermsAndConditions />} />
+            <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+            <Route path="/legal/popia" element={<POPIACompliance />} />
+            {/* Public Silent Salesman vehicle page (QR on showroom cars) */}
+            <Route path="/v/:token" element={<PublicVehicle />} />
 
             {/* ── Protected: Onboarding Wizard (Full Screen) ── */}
             <Route path="/onboarding" element={
@@ -200,6 +215,14 @@ function App() {
             } />
 
             {/* ── Other Protected Modules ── */}
+            {/* ── Protected: Action Queue (follow-ups) ── */}
+            <Route path="/action-queue" element={
+              <AppLayout>
+                <ProtectedRoute module="followups">
+                  <ActionQueue />
+                </ProtectedRoute>
+              </AppLayout>
+            } />
             {/* ── Protected: Lead Pipeline ── */}
             <Route path="/leads" element={
               <AppLayout>
@@ -208,8 +231,6 @@ function App() {
                 </ProtectedRoute>
               </AppLayout>
             } />
-            <Route path="/chatbot" element={<PagePlaceholder title="AI Conversations Hub" module="chatbot" />} />
-
             {/* ── Protected: Customers ── */}
             <Route path="/customers" element={
               <AppLayout>
@@ -250,6 +271,34 @@ function App() {
               <AppLayout>
                 <ProtectedRoute module="retention">
                   <Retention />
+                </ProtectedRoute>
+              </AppLayout>
+            } />
+            <Route path="/customer-care" element={
+              <AppLayout>
+                <ProtectedRoute module="customer-care">
+                  <CustomerCare />
+                </ProtectedRoute>
+              </AppLayout>
+            } />
+            <Route path="/targets" element={
+              <AppLayout>
+                <ProtectedRoute module="targets">
+                  <Targets />
+                </ProtectedRoute>
+              </AppLayout>
+            } />
+            <Route path="/ai-impact" element={
+              <AppLayout>
+                <ProtectedRoute module="ai-impact">
+                  <AIImpact />
+                </ProtectedRoute>
+              </AppLayout>
+            } />
+            <Route path="/online-deals" element={
+              <AppLayout>
+                <ProtectedRoute module="online-deals">
+                  <OnlineDeals />
                 </ProtectedRoute>
               </AppLayout>
             } />

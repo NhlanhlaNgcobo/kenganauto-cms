@@ -1,20 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-    Globe, Mail, MessageCircle, Facebook, Code,
-    CheckCircle2, AlertCircle, ExternalLink, RefreshCw, Send
+    CheckCircle2,
+    Code,
+    ExternalLink,
+    Facebook,
+    Globe,
+    Mail,
+    MessageCircle,
+    Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { PageShell, Surface } from '../components/PageShell';
+import CollapsibleSection from '../components/CollapsibleSection';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Integrations() {
-    const { user, token } = useAuth();
+    const { token } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [testStatus, setTestStatus] = useState({});
 
-    useEffect(() => { loadSettings(); }, []);
+    useEffect(() => {
+        loadSettings();
+    }, []);
 
     const loadSettings = async () => {
         try {
@@ -22,10 +32,11 @@ export default function Integrations() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(res.data.integrations);
-        } catch (e) {
-            console.error('Error fetching integrations:', e);
+        } catch (error) {
+            console.error('Error fetching integrations:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleFacebookConnect = async () => {
@@ -36,143 +47,199 @@ export default function Integrations() {
             if (res.data.success) {
                 loadSettings();
             }
-        } catch (e) { console.error(e); }
-    };
-
-    const runGenericTest = async () => {
-        setTestStatus({ ...testStatus, generic: 'Testing...' });
-        try {
-            await axios.post(`${data.webhook_url}`, {
-                customer_name: "Test Webhook User",
-                customer_phone: "+27820001111",
-                vehicle_interest: "Test Polo GTI",
-                source: "test_button"
-            });
-            setTestStatus({ ...testStatus, generic: 'Success!' });
-            setTimeout(() => setTestStatus({}), 3000);
-        } catch (e) {
-            setTestStatus({ ...testStatus, generic: 'Failed' });
+        } catch (error) {
+            console.error(error);
         }
     };
 
-    if (loading || !data) {
-        return <div className="p-8 text-[#C9A84C] font-black uppercase tracking-widest">Initialising Secure Gateways...</div>;
+    const runGenericTest = async () => {
+        setTestStatus((current) => ({ ...current, generic: 'Testing...' }));
+        try {
+            await axios.post(`${data.webhook_url}`, {
+                customer_name: 'Test Webhook User',
+                customer_phone: '+27820001111',
+                vehicle_interest: 'Test Polo GTI',
+                source: 'test_button'
+            });
+            setTestStatus((current) => ({ ...current, generic: 'Success' }));
+            setTimeout(() => setTestStatus({}), 3000);
+        } catch {
+            setTestStatus((current) => ({ ...current, generic: 'Failed' }));
+        }
+    };
+
+    if (loading) {
+        return <div className="p-8 text-white">Loading integrations...</div>;
     }
 
-    const INTEGRATION_CARDS = [
+    if (!data) {
+        return <div className="p-8 text-white">Failed to load integrations.</div>;
+    }
+
+    const integrationCards = [
         {
             id: 'autotrader',
             name: 'AutoTrader.co.za',
-            icon: <Mail className="text-blue-400" />,
+            icon: Mail,
+            iconColor: 'text-blue-400',
             status: data.autotrader.active ? 'Connected' : 'Offline',
             leads: data.autotrader.leads_this_month,
-            desc: 'Automated email parsing for direct marketplace inquiries.',
-            instructions: `In your AutoTrader Dealer Portal, set your "Lead Forwarding Email" to:`,
-            value: data.inbound_email,
-            type: 'email'
+            summary: 'Marketplace enquiries flow into the CRM through the inbound parsing address.',
+            detail: data.inbound_email,
+            detailLabel: 'Lead forwarding email',
         },
         {
             id: 'cars_coza',
             name: 'Cars.co.za',
-            icon: <Mail className="text-red-400" />,
+            icon: Mail,
+            iconColor: 'text-red-400',
             status: data.cars_coza.active ? 'Connected' : 'Offline',
             leads: data.cars_coza.leads_this_month,
-            desc: 'Real-time ingestion of portal inquiries via inbound parsing.',
-            instructions: `Update your Cars.co.za contact settings with this unique inbound address:`,
-            value: data.inbound_email,
-            type: 'email'
+            summary: 'Direct inbound lead parsing for Cars.co.za enquiries.',
+            detail: data.inbound_email,
+            detailLabel: 'Lead forwarding email',
         },
         {
             id: 'facebook',
             name: 'Facebook Lead Ads',
-            icon: <Facebook className="text-blue-600" />,
-            status: data.facebook.active ? 'Linked' : 'Not Connected',
+            icon: Facebook,
+            iconColor: 'text-blue-500',
+            status: data.facebook.active ? 'Connected' : 'Not connected',
             leads: data.facebook.leads_this_month,
-            desc: 'Direct API integration for Instant Forms and Discovery ads.',
-            instructions: data.facebook.active ? `Connected to: ${data.facebook.page_name}` : 'Connect your Facebook Business Page to sync lead ads instantly.',
-            action: !data.facebook.active ?
-                <button onClick={handleFacebookConnect} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors">Connect Facebook Page</button> :
-                <span className="mt-4 text-[9px] text-green-400 font-bold uppercase tracking-widest flex items-center gap-1"><CheckCircle2 size={12} /> Live Sync Active</span>
+            summary: data.facebook.active ? `Linked to ${data.facebook.page_name}.` : 'Connect a page to sync Instant Form leads directly into the pipeline.',
+            detail: data.facebook.active ? data.facebook.page_name : null,
+            detailLabel: data.facebook.active ? 'Connected page' : null,
+            action: !data.facebook.active ? (
+                <button
+                    onClick={handleFacebookConnect}
+                    className="rounded-xl bg-[#1877F2] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                    Connect Facebook
+                </button>
+            ) : (
+                <span className="inline-flex items-center gap-2 rounded-full bg-green-500/10 px-3 py-1.5 text-sm font-medium text-green-300">
+                    <CheckCircle2 size={14} />
+                    Live sync active
+                </span>
+            ),
         },
         {
             id: 'generic',
             name: 'Generic API Webhook',
-            icon: <Code className="text-emerald-400" />,
+            icon: Code,
+            iconColor: 'text-emerald-400',
             status: 'Operational',
             leads: data.generic_webhook.leads_this_month,
-            desc: 'Connect your own website forms or custom CRM end-points.',
-            instructions: 'Send a POST request with JSON payload to your secure URL:',
-            value: data.webhook_url,
-            type: 'url',
-            test: true
-        }
+            summary: 'Use this webhook for custom website forms or external lead sources.',
+            detail: data.webhook_url,
+            detailLabel: 'Webhook URL',
+            action: (
+                <button
+                    onClick={runGenericTest}
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                    {testStatus.generic ? testStatus.generic : 'Run test'}
+                </button>
+            ),
+        },
     ];
 
     return (
-        <div className="p-8 max-w-7xl mx-auto text-white">
-            <header className="mb-12">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-1.5" style={{ color: 'rgba(201,168,76,0.6)' }}>Ecosystem</p>
-                <h1 className="font-outfit font-black text-3xl text-white tracking-wide">Lead Source Integrations</h1>
-                <p className="text-white/40 text-sm mt-2 max-w-2xl">Connect external marketplaces, social ads and your own website directly into the KenganAuto AI pipeline for immediate response automation.</p>
-            </header>
+        <PageShell
+            title="Lead sources"
+            description="Connect the places your enquiries come from, then expand each source only when you need its setup details."
+        >
+            <div className="grid gap-4 lg:grid-cols-3">
+                <Surface>
+                    <p className="text-sm font-medium text-white/58">Inbound email</p>
+                    <p className="mt-3 text-lg font-semibold text-white break-all">{data.inbound_email}</p>
+                    <p className="mt-2 text-sm leading-7 text-white/58">Use this for marketplace lead forwarding.</p>
+                </Surface>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {INTEGRATION_CARDS.map((card, i) => (
-                    <div key={i} className="bg-black/30 border border-white/5 rounded-3xl p-8 flex flex-col hover:border-white/10 transition-all group">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="p-3 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-white/10 transition-colors">
-                                {card.icon}
-                            </div>
-                            <div className="text-right">
-                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${card.status.includes('Connected') || card.status.includes('Live') || card.status === 'Operational' ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-white/30'}`}>
-                                    {card.status}
-                                </span>
-                                <p className="text-[10px] text-white/40 mt-2 uppercase font-bold tracking-widest">{card.leads} Leads this month</p>
-                            </div>
-                        </div>
+                <Surface>
+                    <p className="text-sm font-medium text-white/58">Webhook endpoint</p>
+                    <p className="mt-3 text-lg font-semibold text-white break-all">{data.webhook_url}</p>
+                    <p className="mt-2 text-sm leading-7 text-white/58">Use this for custom forms and external systems.</p>
+                </Surface>
 
-                        <h3 className="font-outfit font-black text-xl mb-2">{card.name}</h3>
-                        <p className="text-xs text-white/50 leading-relaxed mb-6">{card.desc}</p>
-
-                        <div className="mt-auto pt-6 border-t border-white/5">
-                            <p className="text-[10px] text-[#C9A84C] font-black uppercase tracking-widest mb-3">{card.instructions}</p>
-
-                            {card.value && (
-                                <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between mb-4">
-                                    <code className="text-[11px] font-mono text-white/70 truncate mr-4">{card.value}</code>
-                                    <button onClick={() => navigator.clipboard.writeText(card.value)} className="text-white/30 hover:text-white transition-colors" title="Copy to Clipboard">
-                                        <Code size={14} />
-                                    </button>
-                                </div>
-                            )}
-
-                            {card.action}
-
-                            {card.test && (
-                                <button onClick={runGenericTest} className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors">
-                                    {testStatus.generic || <><Send size={12} /> Run Source Test</>}
-                                </button>
-                            )}
-                        </div>
+                <Surface>
+                    <p className="text-sm font-medium text-white/58">Website chat widget</p>
+                    <div className="mt-3 flex items-center gap-2 text-white">
+                        <Globe size={16} className="text-emerald-400" />
+                        <span className="text-lg font-semibold">Active</span>
                     </div>
-                ))}
+                    <p className="mt-2 text-sm leading-7 text-white/58">Your default web chat capture channel is enabled.</p>
+                </Surface>
             </div>
 
-            <div className="mt-12 bg-[#0A0F1E] border border-white/10 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-2xl">
-                <div className="p-4 bg-emerald-500/10 rounded-full text-emerald-400">
-                    <Globe size={40} />
+            <Surface>
+                <div className="mb-5">
+                    <h2 className="font-outfit text-2xl font-black text-white">Connected sources</h2>
+                    <p className="mt-2 text-sm leading-7 text-white/66">Only the summary is visible at first. Open a source when you want setup details or testing actions.</p>
                 </div>
-                <div className="flex-1">
-                    <h4 className="font-outfit font-black text-xl mb-1">Web Chat Widget</h4>
-                    <p className="text-sm text-white/40">Integrated by default on your primary website. Receives organic traffic leads.</p>
+
+                <div className="space-y-4">
+                    {integrationCards.map((card) => {
+                        const Icon = card.icon;
+                        const isHealthy = card.status === 'Operational' || card.status === 'Connected';
+
+                        return (
+                            <CollapsibleSection
+                                key={card.id}
+                                title={card.name}
+                                subtitle={`${card.summary} ${card.leads} leads this month.`}
+                                action={
+                                    <span className={`rounded-full px-3 py-1.5 text-xs font-medium ${isHealthy ? 'bg-green-500/10 text-green-300' : 'bg-white/8 text-white/66'}`}>
+                                        {card.status}
+                                    </span>
+                                }
+                            >
+                                <div className="flex flex-wrap items-start justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="rounded-2xl bg-white/5 p-3">
+                                            <Icon size={18} className={card.iconColor} />
+                                        </div>
+                                        <div className="max-w-2xl">
+                                            <p className="text-sm leading-7 text-white/66">{card.summary}</p>
+                                            {card.detail ? (
+                                                <div className="mt-4 rounded-2xl bg-white/[0.03] p-4">
+                                                    <p className="text-sm font-medium text-white/58">{card.detailLabel}</p>
+                                                    <p className="mt-2 break-all text-sm font-semibold text-white">{card.detail}</p>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        {card.action}
+                                        {card.detail ? (
+                                            <button
+                                                onClick={() => navigator.clipboard.writeText(card.detail)}
+                                                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                                            >
+                                                Copy
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </CollapsibleSection>
+                        );
+                    })}
                 </div>
-                <div className="flex flex-col items-end gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Status: Active</span>
-                    <button className="text-[10px] font-black uppercase tracking-widest text-[#C9A84C] hover:underline flex items-center gap-1">
-                        Deployment Guide <ExternalLink size={12} />
+            </Surface>
+
+            <Surface>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 className="font-outfit text-2xl font-black text-white">Need deployment help?</h2>
+                        <p className="mt-2 text-sm leading-7 text-white/66">Use the deployment guide if you want help placing the web widget or wiring custom forms.</p>
+                    </div>
+                    <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                        Deployment guide
+                        <ExternalLink size={15} />
                     </button>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </PageShell>
     );
 }

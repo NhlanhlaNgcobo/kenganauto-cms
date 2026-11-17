@@ -1,422 +1,439 @@
-import React, { useState } from 'react';
-import {
-    TrendingUp, TrendingDown, Search, Bell, ChevronRight,
-    HelpCircle, MoreHorizontal, Box, ArrowUpRight,
-    Zap, Users, Car, DollarSign, Activity, Star
-} from 'lucide-react';
-import {
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, PieChart, Pie, Cell
-} from 'recharts';
+import React from 'react';
+import axios from 'axios';
+import { AlertTriangle, ArrowUpRight, Car, Clock, DollarSign, Flame, RefreshCw, Target, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { PageShell, Surface } from '../components/PageShell';
+import { Skeleton } from '../components/Skeleton';
+import { EmptyState } from '../components/EmptyState';
+import { Reveal, Stagger, StaggerItem, CountUp, Magnetic, TiltCard } from '../components/motion';
+import WebsiteActivity from '../components/WebsiteActivity';
 
-/* ── Mock data ── */
-const revenueData = [
-    { month: 'Aug', revenue: 9200000, leads: 58 },
-    { month: 'Sep', revenue: 11500000, leads: 74 },
-    { month: 'Oct', revenue: 10800000, leads: 69 },
-    { month: 'Nov', revenue: 13400000, leads: 88 },
-    { month: 'Dec', revenue: 12100000, leads: 79 },
-    { month: 'Jan', revenue: 14850000, leads: 96 },
-];
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const inventoryData = [
-    { name: 'Luxury', value: 34 },
-    { name: 'SUV', value: 45 },
-    { name: 'Sedan', value: 25 },
-    { name: 'EV', value: 12 },
-];
+function authHeaders() {
+    const token = localStorage.getItem('ka_token') || localStorage.getItem('token');
+    return { Authorization: `Bearer ${token}` };
+}
 
-const DONUT_COLORS = ['#C9A84C', '#3B7FF5', '#4ADE80', '#F472B6'];
+const CARD_ICONS = {
+    active_leads: Users,
+    vehicles_sold: Car,
+    monthly_revenue: DollarSign,
+    ai_resolution: Zap,
+};
+const CARD_TONES = {
+    active_leads: '#C9A84C',
+    vehicles_sold: '#3B7FF5',
+    monthly_revenue: '#4ADE80',
+    ai_resolution: '#F472B6',
+};
+const donutColors = ['#C9A84C', '#3B7FF5', '#4ADE80', '#F472B6', '#F59E0B'];
 
-const recentLeads = [
-    { name: 'Thabo Molefe', vehicle: 'Mercedes GLE 450', status: 'Hot', value: 'R 1.2M', avatar: 'TM' },
-    { name: 'Priya Naidoo', vehicle: 'BMW X5 M Sport', status: 'Warm', value: 'R 980k', avatar: 'PN' },
-    { name: 'Siyanda Dlamini', vehicle: 'Audi Q7 Quattro', status: 'Cold', value: 'R 850k', avatar: 'SD' },
-    { name: 'Jacques Du Plessis', vehicle: 'Range Rover Sport', status: 'Hot', value: 'R 1.8M', avatar: 'JD' },
-];
-
+const STATUS_LABELS = {
+    new: 'New', contacted: 'Contacted', qualified: 'Qualified',
+    test_drive_booked: 'Test drive', negotiation: 'Negotiation', won: 'Won', lost: 'Lost',
+};
 const statusStyles = {
-    Hot: { bg: 'rgba(239,68,68,0.1)', text: '#F87171', dot: '#EF4444' },
-    Warm: { bg: 'rgba(245,158,11,0.1)', text: '#FBBF24', dot: '#F59E0B' },
-    Cold: { bg: 'rgba(59,130,246,0.1)', text: '#60A5FA', dot: '#3B82F6' },
+    new: 'bg-blue-500/12 text-blue-300',
+    contacted: 'bg-indigo-500/12 text-indigo-300',
+    qualified: 'bg-amber-500/12 text-amber-300',
+    test_drive_booked: 'bg-violet-500/12 text-violet-300',
+    negotiation: 'bg-orange-500/12 text-orange-300',
 };
 
-/* ── Custom Tooltip ── */
-const CustomTooltip = ({ active, payload, label }) => {
+/* ── Formatting ── */
+function formatZar(n) {
+    const v = Number(n || 0);
+    if (v >= 1_000_000) return `R ${(v / 1_000_000).toFixed(2)}M`;
+    if (v >= 1_000) return `R ${Math.round(v / 1_000)}k`;
+    return `R ${v.toLocaleString('en-ZA')}`;
+}
+function formatMinutes(m) {
+    if (m == null) return '—';
+    if (m < 60) return `${Math.round(m)} min`;
+    const h = Math.floor(m / 60);
+    const mm = Math.round(m % 60);
+    return mm ? `${h}h ${mm}m` : `${h}h`;
+}
+
+const SOURCE_COLORS = ['#C9A84C', '#3B7FF5', '#4ADE80', '#F472B6', '#F59E0B', '#22D3EE', '#A78BFA'];
+
+function cardFormatter(card) {
+    if (card.format === 'zar') return (n) => formatZar(n);
+    if (card.format === 'percent') return (n) => `${Math.round(n)}%`;
+    return (n) => Math.round(n).toLocaleString('en-ZA');
+}
+
+function RevenueTooltip({ active, payload, label }) {
     if (!active || !payload?.length) return null;
     return (
-        <div className="px-4 py-3 rounded-xl text-sm font-medium"
-            style={{ background: '#0A0F1E', border: '1px solid rgba(201,168,76,0.25)', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
-            <p style={{ color: '#C9A84C', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>{label}</p>
-            <p style={{ color: '#F0EDE8', fontFamily: 'Outfit', fontWeight: 700, fontSize: '1rem' }}>
-                R {(payload[0]?.value / 1_000_000).toFixed(2)}M
-            </p>
+        <div className="rounded-2xl border border-white/10 bg-[#0D1526] px-4 py-3 shadow-xl">
+            <p className="text-xs text-white/58">{label}</p>
+            <p className="mt-1 font-outfit text-lg font-black text-white">{formatZar(payload[0].value)}</p>
+            <p className="mt-0.5 text-xs text-white/58">{payload[0].payload.units} sold</p>
         </div>
     );
-};
+}
 
-/* ── Stat Card ── */
-const StatCard = ({ label, value, sub, trend, icon: Icon, iconColor, delay = '' }) => {
-    const isUp = trend >= 0;
+function StatCard({ card }) {
+    const IconComponent = CARD_ICONS[card.key] || Users;
+    const tone = CARD_TONES[card.key] || '#C9A84C';
+    const hasTrend = Number.isFinite(card.trend) && card.trend !== 0;
+    const isPositive = (card.trend || 0) >= 0;
+    const TrendIcon = isPositive ? TrendingUp : TrendingDown;
+
     return (
-        <div className={`stat-card anim-fade-up ${delay}`}>
-            <div className="flex items-start justify-between mb-5">
-                <div className="p-2.5 rounded-xl" style={{ background: `${iconColor}15`, border: `1px solid ${iconColor}25` }}>
-                    <Icon size={18} style={{ color: iconColor }} strokeWidth={2} />
+        <TiltCard max={6} className="h-full">
+            <Surface className="h-full rounded-2xl p-5">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border"
+                        style={{ backgroundColor: `${tone}14`, borderColor: `${tone}35` }}>
+                        <IconComponent size={18} style={{ color: tone }} />
+                    </div>
+                    {hasTrend && (
+                        <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${isPositive ? 'bg-emerald-500/12 text-emerald-300' : 'bg-red-500/12 text-red-300'}`}>
+                            <TrendIcon size={12} />
+                            {isPositive ? '+' : ''}{card.trend}%
+                        </div>
+                    )}
                 </div>
-                <div className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full`}
-                    style={{ background: isUp ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)', color: isUp ? '#4ADE80' : '#F87171' }}>
-                    {isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                    {isUp ? '+' : ''}{trend}%
-                </div>
-            </div>
-            <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(240,237,232,0.4)' }}>
-                {label}
-            </p>
-            <p className="font-outfit font-black text-3xl text-white mb-1">{value}</p>
-            {sub && <p className="text-[11px]" style={{ color: 'rgba(240,237,232,0.35)' }}>{sub}</p>}
-        </div>
+                <p className="mt-5 text-sm text-white/66">{card.label}</p>
+                <p className="mt-1 font-outfit text-3xl font-black text-white">
+                    {card.value == null ? '—' : <CountUp value={card.value} format={cardFormatter(card)} />}
+                </p>
+                <p className="mt-2 text-sm text-white/58">{card.subtext}</p>
+            </Surface>
+        </TiltCard>
     );
-};
+}
 
-/* ══════════════════════════════════════════════ */
-const Dashboard = () => {
-    const [searchVal, setSearchVal] = useState('');
-
+function SpeedToLead({ data }) {
+    const pct = data.under_5min_pct;
+    const meetsTarget = data.avg_minutes != null && data.avg_minutes <= data.target_minutes;
+    const tiles = [
+        {
+            icon: Clock,
+            label: 'Avg first response',
+            value: formatMinutes(data.avg_minutes),
+            note: data.avg_minutes == null ? 'No responses yet' : (meetsTarget ? 'Beating the 5-min target' : `Target: ${data.target_minutes} min`),
+            tone: meetsTarget ? '#4ADE80' : '#F59E0B',
+        },
+        {
+            icon: Target,
+            label: 'Replied within 5 min',
+            value: pct == null ? '—' : `${pct}%`,
+            note: 'Leads contacted inside 5 minutes',
+            tone: '#3B7FF5',
+        },
+        {
+            icon: Flame,
+            label: 'Follow-ups due now',
+            value: data.followups_due ?? 0,
+            note: data.followups_due ? 'Overdue — contact today' : 'All caught up',
+            tone: data.followups_due ? '#F87171' : '#4ADE80',
+        },
+    ];
     return (
-        <div className="flex flex-col min-h-screen" style={{ background: 'transparent' }}>
-
-            {/* ── Top Header ── */}
-            <header className="flex-shrink-0 px-4 md:px-8 pl-16 md:pl-8 flex items-center justify-between sticky top-0 z-40 py-4 md:py-5"
-                style={{
-                    background: 'rgba(10,15,30,0.85)',
-                    backdropFilter: 'blur(20px)',
-                    borderBottom: '1px solid rgba(201,168,76,0.08)',
-                    boxShadow: '0 4px 40px rgba(0,0,0,0.4)',
-                }}>
-
-                {/* Brand */}
-                <div className="flex items-center gap-3 anim-slide-right">
-                    <div className="flex flex-col">
-                        <h1 className="font-outfit font-black text-xl tracking-tight leading-none">
-                            <span className="text-white">KENGAN</span>
-                            <span className="gold-text">AUTO</span>
-                        </h1>
-                        <p className="text-[9px] tracking-[0.25em] uppercase mt-0.5" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                            Automotive Intelligence OS
+        <Reveal as="section" y={24}>
+            <Surface className="rounded-3xl">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h2 className="font-outfit text-2xl font-black text-white">Speed to lead</h2>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-white/66">
+                            Responding within 5 minutes is the single biggest conversion lever — leads contacted fast are far more likely to book and buy. This tracks how quickly enquiries get their first reply.
                         </p>
                     </div>
                 </div>
 
-                {/* Search */}
-                <div className="relative max-w-md w-full mx-4 md:mx-8 anim-fade-in delay-100 hidden sm:block">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(240,237,232,0.3)' }} />
-                    <input
-                        type="text"
-                        value={searchVal}
-                        onChange={e => setSearchVal(e.target.value)}
-                        placeholder="Search leads, vehicles, clients…"
-                        className="w-full py-2.5 pl-11 pr-5 text-sm rounded-xl outline-none transition-all"
-                        style={{
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(201,168,76,0.12)',
-                            color: '#F0EDE8',
-                            fontFamily: 'Inter',
-                        }}
-                    />
+                {/* Flat stat strip: dividers, not nested cards */}
+                <div className="mt-6 grid gap-y-5 border-t border-white/8 pt-5 md:grid-cols-3 md:divide-x md:divide-white/8">
+                    {tiles.map((t) => {
+                        const Icon = t.icon;
+                        return (
+                            <div key={t.label} className="md:px-6 md:first:pl-0">
+                                <p className="flex items-center gap-2 text-sm text-white/66">
+                                    <Icon size={15} style={{ color: t.tone }} aria-hidden="true" />
+                                    {t.label}
+                                </p>
+                                <p className="mt-1.5 font-outfit text-2xl font-black text-white tabular-nums">{t.value}</p>
+                                <p className="mt-1.5 text-xs" style={{ color: `${t.tone}` }}>{t.note}</p>
+                            </div>
+                        );
+                    })}
                 </div>
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-4 anim-fade-in delay-200">
-                    <button className="relative p-2.5 rounded-xl transition-all hover:bg-white/5"
-                        style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <Bell size={18} style={{ color: 'rgba(240,237,232,0.5)' }} />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#C9A84C]"
-                            style={{ boxShadow: '0 0 8px rgba(201,168,76,0.6)' }} />
-                    </button>
-                    <button className="p-2.5 rounded-xl transition-all hover:bg-white/5"
-                        style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <HelpCircle size={18} style={{ color: 'rgba(240,237,232,0.5)' }} />
-                    </button>
-
-                    <div className="h-8 w-px mx-1" style={{ background: 'rgba(201,168,76,0.12)' }} />
-
-                    {/* User Profile */}
-                    <div className="flex items-center gap-3 cursor-pointer group">
-                        <div className="h-9 w-9 rounded-xl flex items-center justify-center font-outfit font-black text-sm"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.1))',
-                                border: '1px solid rgba(201,168,76,0.3)',
-                                color: '#C9A84C',
-                            }}>
-                            DM
+                {pct != null && (
+                    <div className="mt-5">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-white/8">
+                            <div className="h-full rounded-full transition-all"
+                                style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#C9A84C,#4ADE80)' }} />
                         </div>
-                        <div className="hidden md:block">
-                            <p className="text-sm font-bold text-white leading-none">David M.</p>
-                            <p className="text-[10px] font-bold uppercase tracking-widest mt-0.5" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                Admin
-                            </p>
-                        </div>
-                        <ChevronRight size={14} style={{ color: 'rgba(240,237,232,0.2)' }} className="group-hover:translate-x-0.5 transition-transform" />
+                        <p className="mt-2 text-xs text-white/58">{pct}% of responded leads were answered within the 5-minute window.</p>
+                    </div>
+                )}
+            </Surface>
+        </Reveal>
+    );
+}
+
+function SourcePerformance({ sources }) {
+    if (!sources?.length) return null;
+    const max = Math.max(...sources.map(s => s.leads), 1);
+    return (
+        <Reveal as="section" y={28}>
+            <Surface className="rounded-3xl">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h2 className="font-outfit text-2xl font-black text-white">Lead source performance</h2>
+                        <p className="mt-2 text-sm leading-6 text-white/66">Where your enquiries come from, and which channels actually convert to sales. Double down on what wins.</p>
                     </div>
                 </div>
-            </header>
+                <div className="mt-6 divide-y divide-white/8">
+                    {sources.map((s, i) => (
+                        <div key={s.source} className="flex items-center gap-4 py-3">
+                            <div className="flex w-28 shrink-0 items-center gap-2">
+                                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: SOURCE_COLORS[i % SOURCE_COLORS.length] }} />
+                                <span className="text-sm font-medium text-white/80">{s.source}</span>
+                            </div>
+                            <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white/6">
+                                <div className="h-full rounded-full"
+                                    style={{ width: `${(s.leads / max) * 100}%`, backgroundColor: SOURCE_COLORS[i % SOURCE_COLORS.length] }} />
+                            </div>
+                            <span className="w-16 shrink-0 text-right text-sm font-semibold text-white">{s.leads} leads</span>
+                            <span className={`w-24 shrink-0 text-right text-sm font-semibold ${s.conversion_pct >= 30 ? 'text-emerald-300' : s.conversion_pct > 0 ? 'text-amber-300' : 'text-white/58'}`}>
+                                {s.conversion_pct}% won
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </Surface>
+        </Reveal>
+    );
+}
 
-            {/* ── Page Title Strip ── */}
-            <div className="px-4 md:px-8 pt-8 pb-4 anim-fade-up">
-                <p className="text-[10px] font-bold uppercase tracking-[0.25em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                    Command Centre
-                </p>
-                <h2 className="font-outfit font-black text-3xl text-white">
-                    Performance <span className="gold-text">Dashboard</span>
-                </h2>
+function DashboardSkeleton() {
+    return (
+        <>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-40 rounded-2xl" />)}
             </div>
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_360px]">
+                <Skeleton className="h-96 rounded-3xl" />
+                <Skeleton className="h-96 rounded-3xl" />
+            </div>
+            <Skeleton className="h-64 rounded-3xl" />
+        </>
+    );
+}
 
-            {/* ── Main Content ── */}
-            <div className="flex-1 px-4 md:px-8 pb-10 overflow-y-auto w-full max-w-full">
-                <div className="max-w-[1600px] mx-auto w-full">
+export default function Dashboard() {
+    const [data, setData] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState(null);
 
-                    {/* ── KPI Row ── */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8">
-                        <StatCard label="Active Leads" value="87" sub="+12 this week" trend={12} icon={Users} iconColor="#C9A84C" delay="delay-100" />
-                        <StatCard label="Vehicles Sold" value="124" sub="October 2025" trend={18} icon={Car} iconColor="#3B7FF5" delay="delay-200" />
-                        <StatCard label="Monthly Revenue" value="R 14.85M" sub="Oct 2025" trend={8.5} icon={DollarSign} iconColor="#4ADE80" delay="delay-300" />
-                        <StatCard label="AI Resolution" value="83%" sub="Chatbot close rate" trend={-2} icon={Zap} iconColor="#F472B6" delay="delay-400" />
-                    </div>
+    const load = React.useCallback(async () => {
+        try {
+            setError(null);
+            const res = await axios.get(`${API_BASE}/api/dashboard/overview`, { headers: authHeaders() });
+            setData(res.data);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Could not load your dashboard. Check that the backend is running.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-                    {/* ── Charts + AI Panel Row ── */}
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+    React.useEffect(() => {
+        load();
+        const id = setInterval(load, 60_000); // refresh every minute
+        return () => clearInterval(id);
+    }, [load]);
 
-                        {/* Revenue Chart — 2 cols */}
-                        <div className="xl:col-span-2 luxury-card p-7 anim-fade-up delay-200">
-                            <div className="flex items-center justify-between mb-7">
+    const refresh = () => { setLoading(true); load(); };
+
+    return (
+        <PageShell
+            title="Performance dashboard"
+            description="A live view of pipeline health, revenue momentum, inventory mix, and the leads that need attention next."
+            actions={(
+                <Magnetic strength={0.35}>
+                    <button
+                        onClick={refresh}
+                        className="inline-flex items-center gap-2 rounded-2xl border border-[#C9A84C]/25 bg-[#C9A84C]/10 px-4 py-2 text-sm font-semibold text-[#F7D774] transition hover:bg-[#C9A84C]/16"
+                    >
+                        <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
+                    </button>
+                </Magnetic>
+            )}
+            maxWidth="max-w-[1440px]"
+        >
+            {loading && !data ? (
+                <DashboardSkeleton />
+            ) : error ? (
+                <Surface className="rounded-3xl">
+                    <EmptyState
+                        icon={AlertTriangle}
+                        title="Couldn't load the dashboard"
+                        description={error}
+                        actionLabel="Try again"
+                        onAction={refresh}
+                    />
+                </Surface>
+            ) : data ? (
+                <>
+                    <Stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" stagger={0.08} amount={0.3}>
+                        {data.stat_cards.map((card) => (
+                            <StaggerItem key={card.key}><StatCard card={card} /></StaggerItem>
+                        ))}
+                    </Stagger>
+
+                    <Reveal y={24}><WebsiteActivity /></Reveal>
+
+                    {data.speed_to_lead && <SpeedToLead data={data.speed_to_lead} />}
+
+                    <Reveal className="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_360px]" y={28}>
+                        <Surface className="rounded-3xl">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                        Revenue Trend
+                                    <h2 className="font-outfit text-2xl font-black text-white">Revenue trend</h2>
+                                    <p className="mt-2 text-sm leading-6 text-white/66">
+                                        Closed-deal revenue across the last six months, pulled live from your deals.
                                     </p>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Sales Performance</h3>
                                 </div>
-                                <button className="p-2 rounded-lg transition-all hover:bg-white/5" style={{ color: 'rgba(240,237,232,0.3)' }}>
-                                    <MoreHorizontal size={18} />
-                                </button>
+                                <div className="text-right">
+                                    <p className="text-xs text-white/58">Open pipeline</p>
+                                    <p className="mt-1 font-outfit text-2xl font-black text-white">{formatZar(data.pipeline_value)}</p>
+                                </div>
                             </div>
 
-                            <div className="h-64">
+                            <div className="mt-8 h-80">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={revenueData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                                    <AreaChart data={data.revenue_trend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                         <defs>
-                                            <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#C9A84C" stopOpacity={0.25} />
+                                            <linearGradient id="dashboardRevenueGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#C9A84C" stopOpacity={0.32} />
                                                 <stop offset="100%" stopColor="#C9A84C" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
-                                        <XAxis dataKey="month" stroke="rgba(240,237,232,0.2)" fontSize={11} axisLine={false} tickLine={false}
-                                            tick={{ fill: 'rgba(240,237,232,0.35)', fontFamily: 'Inter', fontWeight: 600 }} />
+                                        <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 12 }} />
                                         <YAxis hide />
-                                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(201,168,76,0.2)', strokeWidth: 1 }} />
-                                        <Area type="monotone" dataKey="revenue" stroke="#C9A84C" strokeWidth={2.5}
-                                            fillOpacity={1} fill="url(#goldGrad)" dot={false}
-                                            activeDot={{ r: 5, fill: '#C9A84C', stroke: '#0A0F1E', strokeWidth: 2 }} />
+                                        <Tooltip content={<RevenueTooltip />} cursor={{ stroke: 'rgba(201,168,76,0.25)', strokeDasharray: '4 4' }} />
+                                        <Area type="monotone" dataKey="revenue" stroke="#C9A84C" strokeWidth={3}
+                                            fill="url(#dashboardRevenueGradient)"
+                                            activeDot={{ r: 5, fill: '#C9A84C', stroke: '#0F172A', strokeWidth: 2 }} />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
-                        </div>
+                        </Surface>
 
-                        {/* Inventory Donut — 1 col */}
-                        <div className="luxury-card p-7 anim-fade-up delay-300">
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                        Stock
-                                    </p>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Inventory Mix</h3>
-                                </div>
-                                <button className="p-2 rounded-lg transition-all hover:bg-white/5" style={{ color: 'rgba(240,237,232,0.3)' }}>
-                                    <MoreHorizontal size={18} />
-                                </button>
-                            </div>
+                        <div className="space-y-6">
+                            <Surface className="rounded-3xl">
+                                <h2 className="font-outfit text-2xl font-black text-white">Inventory mix</h2>
+                                <p className="mt-2 text-sm leading-6 text-white/66">Available stock by condition.</p>
 
-                            <div className="h-44 flex items-center justify-center">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie data={inventoryData} innerRadius={55} outerRadius={78} paddingAngle={4} dataKey="value"
-                                            stroke="none">
-                                            {inventoryData.map((_, i) => (
-                                                <Cell key={i} fill={DONUT_COLORS[i]} opacity={0.85} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            contentStyle={{ background: '#0A0F1E', border: '1px solid rgba(201,168,76,0.25)', borderRadius: 10, fontSize: 12 }}
-                                            itemStyle={{ color: '#F0EDE8' }}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2 mt-4">
-                                {inventoryData.map((item, i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: DONUT_COLORS[i] }} />
-                                        <span className="text-[11px] font-semibold" style={{ color: 'rgba(240,237,232,0.6)' }}>
-                                            {item.name} — <span className="text-white font-bold">{item.value}</span>
-                                        </span>
+                                {data.inventory_mix.length === 0 ? (
+                                    <div className="mt-6">
+                                        <EmptyState icon={Car} title="No stock yet" description="Add vehicles in the Stock module and they'll appear here." />
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                                ) : (
+                                    <>
+                                        <div className="relative mt-6 h-56">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie data={data.inventory_mix} innerRadius={58} outerRadius={82} paddingAngle={4} dataKey="value">
+                                                        {data.inventory_mix.map((item, index) => <Cell key={item.name} fill={donutColors[index % donutColors.length]} />)}
+                                                    </Pie>
+                                                    <Tooltip contentStyle={{ background: '#0D1526', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, color: '#fff' }} />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                                <span className="font-outfit text-3xl font-black text-white">{data.inventory_total}</span>
+                                                <span className="text-xs text-white/58">vehicles</span>
+                                            </div>
+                                        </div>
 
-                    {/* ── Leads Table + AI Panel ── */}
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                                        <div className="mt-6 divide-y divide-white/8">
+                                            {data.inventory_mix.map((item, index) => (
+                                                <div key={item.name} className="flex items-center justify-between py-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: donutColors[index % donutColors.length] }} />
+                                                        <span className="text-sm text-white/72">{item.name}</span>
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-white">{item.value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </Surface>
 
-                        {/* Recent Leads — 2 cols */}
-                        <div className="xl:col-span-2 luxury-card p-7 anim-fade-up delay-300">
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                        Pipeline
-                                    </p>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Active Leads</h3>
+                            <Surface className="rounded-3xl">
+                                <h2 className="font-outfit text-2xl font-black text-white">AI focus</h2>
+                                <p className="mt-2 text-sm leading-6 text-white/66">The next recommended moves, generated from your live pipeline.</p>
+                                <div className="mt-6 divide-y divide-white/8">
+                                    {data.ai_focus.map((item) => (
+                                        <div key={item} className="py-3 text-sm leading-6 text-white/72">
+                                            {item}
+                                        </div>
+                                    ))}
                                 </div>
-                                <button className="btn-gold text-[11px] py-2 px-4">
-                                    View All <ArrowUpRight size={13} />
-                                </button>
-                            </div>
+                            </Surface>
+                        </div>
+                    </Reveal>
 
-                            <div className="space-y-2">
-                                {recentLeads.map((lead, i) => (
-                                    <div key={i}
-                                        className="flex items-center justify-between px-4 py-4 rounded-xl cursor-pointer group transition-all"
-                                        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
-                                        onMouseEnter={e => {
-                                            e.currentTarget.style.background = 'rgba(201,168,76,0.04)';
-                                            e.currentTarget.style.borderColor = 'rgba(201,168,76,0.15)';
-                                        }}
-                                        onMouseLeave={e => {
-                                            e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)';
-                                        }}
-                                    >
+                    {data.source_performance && <SourcePerformance sources={data.source_performance} />}
+
+                    <Reveal as="section" y={28}>
+                    <Surface className="rounded-3xl">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <h2 className="font-outfit text-2xl font-black text-white">Leads needing attention</h2>
+                                <p className="mt-2 text-sm leading-6 text-white/66">Overdue follow-ups first, then your hottest active leads.</p>
+                            </div>
+                            <a href="/leads" className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-[#0D1526] px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-[#C9A84C]/20 hover:text-white">
+                                View full pipeline <ArrowUpRight size={16} />
+                            </a>
+                        </div>
+
+                        {data.leads_attention.length === 0 ? (
+                            <div className="mt-6">
+                                <EmptyState icon={Users} title="No active leads" description="New leads from WhatsApp, your website, or the chatbot will show up here." />
+                            </div>
+                        ) : (
+                            <div className="mt-6 divide-y divide-white/8">
+                                {data.leads_attention.map((lead) => (
+                                    <div key={lead.id} className="flex flex-wrap items-center justify-between gap-4 py-3">
                                         <div className="flex items-center gap-4">
-                                            {/* Avatar */}
-                                            <div className="h-10 w-10 rounded-xl flex items-center justify-center text-[13px] font-black flex-shrink-0 font-outfit"
-                                                style={{ background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.2)', color: '#C9A84C' }}>
-                                                {lead.avatar}
+                                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#C9A84C]/18 bg-[#C9A84C]/10 font-outfit text-sm font-black text-[#F7D774]">
+                                                {(lead.name || '?').split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm text-white">{lead.name}</p>
-                                                <p className="text-[11px]" style={{ color: 'rgba(240,237,232,0.4)' }}>{lead.vehicle}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm font-semibold text-white">{lead.name}</p>
+                                                    {lead.overdue && (
+                                                        <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-red-300">Overdue</span>
+                                                    )}
+                                                </div>
+                                                <p className="mt-1 text-sm text-white/58">{lead.vehicle}</p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-4">
-                                            {/* Status Pill */}
-                                            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full"
-                                                style={{
-                                                    background: statusStyles[lead.status].bg,
-                                                    color: statusStyles[lead.status].text,
-                                                }}>
-                                                ● {lead.status}
+                                        <div className="flex items-center gap-3">
+                                            <span className="rounded-full bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/66" title="AI lead score">★ {lead.ai_score}</span>
+                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[lead.status] || 'bg-white/8 text-white/70'}`}>
+                                                {STATUS_LABELS[lead.status] || lead.status}
                                             </span>
-                                            {/* Value */}
-                                            <span className="font-outfit font-bold text-sm" style={{ color: '#C9A84C' }}>{lead.value}</span>
-                                            <ChevronRight size={14} style={{ color: 'rgba(240,237,232,0.2)' }} className="group-hover:translate-x-0.5 transition-transform" />
+                                            {lead.value != null && <span className="text-sm font-semibold text-[#F7D774]">{formatZar(lead.value)}</span>}
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* AI Insights Panel — 1 col */}
-                        <div className="anim-fade-up delay-400">
-                            <div className="luxury-card h-full p-7 overflow-hidden">
-                                {/* Header */}
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2.5 rounded-xl" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
-                                        <Zap size={18} style={{ color: '#C9A84C' }} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.25em]" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                            AI ENGINE
-                                        </p>
-                                        <p className="text-sm font-bold text-white">Kengan Insights</p>
-                                    </div>
-                                </div>
-
-                                {/* AI Avatar */}
-                                <div className="rounded-2xl p-6 mb-6 text-center relative overflow-hidden"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #0A0F1E 0%, #1E3A5F 100%)',
-                                        border: '1px solid rgba(59,127,245,0.2)',
-                                        boxShadow: '0 0 40px rgba(59,127,245,0.07)',
-                                    }}>
-                                    {/* Glow */}
-                                    <div className="absolute inset-0 pointer-events-none"
-                                        style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(59,127,245,0.2), transparent 70%)' }} />
-
-                                    <div className="h-14 w-14 mx-auto rounded-2xl flex items-center justify-center font-outfit font-black text-xl text-white mb-3 relative z-10"
-                                        style={{
-                                            background: 'linear-gradient(135deg, rgba(59,127,245,0.3), rgba(59,127,245,0.1))',
-                                            border: '1px solid rgba(59,127,245,0.4)',
-                                            boxShadow: '0 0 24px rgba(59,127,245,0.3)',
-                                        }}>
-                                        KA
-                                    </div>
-                                    <p className="font-outfit font-black text-white text-sm tracking-wider relative z-10">KENGAN AI</p>
-                                    <p className="text-[9px] tracking-[0.25em] uppercase mt-1 relative z-10" style={{ color: 'rgba(59,127,245,0.6)' }}>
-                                        Connected
-                                    </p>
-                                </div>
-
-                                {/* Insight Items */}
-                                <div className="space-y-3 mb-6">
-                                    {[
-                                        'High-value lead: Thabo M. (Mercedes GLE). Follow-up recommended.',
-                                        'BMW 7-Series inventory low — only 2 units remaining.',
-                                        '8 leads matched to new Pre-Owned SUV stock.',
-                                        'X5 marketing peak detected — boost campaign now.',
-                                    ].map((text, i) => (
-                                        <div key={i} className="flex gap-3 p-3 rounded-xl cursor-pointer group transition-all"
-                                            style={{ background: 'rgba(255,255,255,0.02)' }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(201,168,76,0.04)'; }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}>
-                                            <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: '#C9A84C' }} />
-                                            <p className="text-xs leading-relaxed" style={{ color: 'rgba(240,237,232,0.55)' }}>{text}</p>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <hr className="gold-divider mb-4" />
-
-                                {/* Actions */}
-                                <div className="space-y-2">
-                                    {['Contact Thabo M.', 'Restock BMW 7-Series', 'Activate SUV Leads'].map((action, i) => (
-                                        <button key={i} className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[12px] font-bold transition-all"
-                                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(240,237,232,0.7)' }}
-                                            onMouseEnter={e => {
-                                                e.currentTarget.style.borderColor = 'rgba(201,168,76,0.2)';
-                                                e.currentTarget.style.background = 'rgba(201,168,76,0.04)';
-                                                e.currentTarget.style.color = '#F0EDE8';
-                                            }}
-                                            onMouseLeave={e => {
-                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                                                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                                                e.currentTarget.style.color = 'rgba(240,237,232,0.7)';
-                                            }}>
-                                            {action}
-                                            <ChevronRight size={13} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+                        )}
+                    </Surface>
+                    </Reveal>
+                </>
+            ) : null}
+        </PageShell>
     );
-};
-
-export default Dashboard;
+}

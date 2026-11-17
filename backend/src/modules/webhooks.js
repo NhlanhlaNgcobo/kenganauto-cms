@@ -134,45 +134,13 @@ async function _handleInboundMessage({ tenantId, msg, value }) {
         return;
     }
 
-    /* ── Mark as read ── */
-    await whatsapp.markAsRead(tenantId, msgId);
+    /* ── Mark as read (non-fatal) ── */
+    try { await whatsapp.markAsRead(tenantId, msgId); } catch { /* non-fatal */ }
 
-    /* ── 1. Get or Create Lead ── */
-    let lead = await Lead.query().findOne({ tenant_id: tenantId, customer_phone: phone });
-    const contactName = value.contacts?.[0]?.profile?.name || 'WhatsApp Customer';
+    /* ── CSI survey reply ("9 great service") → record + AI triage; skip the chatbot ── */
+    if (await require('./customer_care').handleCsiReply(tenantId, phone, customerText)) return;
 
-    if (!lead) {
-        lead = await Lead.query().insert({
-            tenant_id: tenantId,
-            customer_name: contactName,
-            customer_phone: phone,
-            source: 'whatsapp',
-            status: 'new',
-        });
-        console.log(`[webhook] Created new lead ${lead.id} for ${phone}`);
-    }
-
-    /* ── 2. Get or Create Conversation ── */
-    let conversation = await Conversation.query().findOne({
-        tenant_id: tenantId,
-        lead_id: lead.id,
-        channel: 'whatsapp'
-    });
-
-    if (!conversation) {
-        conversation = await Conversation.query().insert({
-            tenant_id: tenantId,
-            lead_id: lead.id,
-            channel: 'whatsapp',
-            messages: [],
-        });
-    }
-
-    /* ── 3. Append User Message ── */
-    const sessionMessages = conversation.messages || [];
-    sessionMessages.push({ role: 'user', content: customerText, timestamp: new Date().toISOString() });
-
-    /* ── Build tenant context ── */
+    /* ── Build tenant context from config store ── */
     const tenantConfig = whatsapp.getTenantConfig(tenantId);
     const tenant = {
         id: tenantId,
@@ -180,6 +148,56 @@ async function _handleInboundMessage({ tenantId, msg, value }) {
         whatsapp_number: tenantConfig?.whatsappNumber || '',
         opening_hours: 'Mon–Fri: 08:00–17:30 | Sat: 08:00–13:00 | Sun: Closed',
     };
+
+    /* ── 1. Get or Create Lead (with DB fallback) ── */
+    let lead = null;
+    let sessionMessages = [];
+    let conversation = null;
+    const contactName = value.contacts?.[0]?.profile?.name || 'WhatsApp Customer';
+
+    try {
+        lead = await Lead.query().findOne({ tenant_id: tenantId, customer_phone: phone });
+        if (!lead) {
+            lead = await Lead.query().insert({
+                tenant_id: tenantId,
+                customer_name: contactName,
+                customer_phone: phone,
+                source: 'whatsapp',
+                status: 'new',
+            });
+            console.log(`[webhook] Created new lead ${lead.id} for ${phone}`);
+        }
+
+        /* ── 2. Get or Create Conversation ── */
+        conversation = await Conversation.query().findOne({
+            tenant_id: tenantId,
+            lead_id: lead.id,
+            channel: 'whatsapp'
+        });
+        if (!conversation) {
+            conversation = await Conversation.query().insert({
+                tenant_id: tenantId,
+                lead_id: lead.id,
+                channel: 'whatsapp',
+                messages: JSON.stringify([]),
+            });
+        }
+
+        /* ── 3. Deserialize stored messages ── */
+        const rawMessages = conversation.messages;
+        sessionMessages = Array.isArray(rawMessages)
+            ? rawMessages
+            : (typeof rawMessages === 'string' ? JSON.parse(rawMessages || '[]') : []);
+
+    } catch (dbErr) {
+        console.error(`[webhook] DB error for tenant ${tenantId}, falling back to stateless mode:`, dbErr.message);
+        // Stateless fallback — still reply to customer but don't persist
+        lead = { id: null, customer_name: contactName, customer_phone: phone };
+        sessionMessages = [];
+    }
+
+    /* ── Append User Message ── */
+    sessionMessages.push({ role: 'user', content: customerText, timestamp: new Date().toISOString() });
 
     /* ── Intent detection ── */
     const analysis = await AIEngine.detectIntentAndSentiment(customerText, sessionMessages.slice(-6));
@@ -199,17 +217,23 @@ async function _handleInboundMessage({ tenantId, msg, value }) {
     /* ── Append AI response ── */
     sessionMessages.push({ role: 'assistant', content: cleanText, timestamp: new Date().toISOString() });
 
-    /* ── 4. Persist to DB ── */
-    await conversation.$query().patch({
-        messages: sessionMessages,
-        intent_detected: analysis.intent,
-        sentiment_score: analysis.sentiment,
-        updated_at: new Date().toISOString(),
-    });
+    /* ── 4. Persist to DB (non-fatal) ── */
+    if (conversation?.id) {
+        try {
+            await conversation.$query().patch({
+                messages: JSON.stringify(sessionMessages),
+                intent_detected: analysis.intent,
+                sentiment_score: analysis.sentiment,
+                updated_at: new Date().toISOString(),
+            });
 
-    // Update lead metadata if name was extracted
-    if (analysis.extracted?.name && lead.customer_name === 'WhatsApp Customer') {
-        await lead.$query().patch({ customer_name: analysis.extracted.name });
+            // Update lead name if extracted and still default
+            if (analysis.extracted?.name && lead.customer_name === 'WhatsApp Customer') {
+                await lead.$query().patch({ customer_name: analysis.extracted.name });
+            }
+        } catch (persistErr) {
+            console.error('[webhook] Failed to persist conversation:', persistErr.message);
+        }
     }
 
     /* ── 5. Send response back via WhatsApp ── */
@@ -222,11 +246,11 @@ async function _handleInboundMessage({ tenantId, msg, value }) {
     const isHandoff = analysis.intent === INTENTS.HUMAN_HANDOFF || analysis.is_frustrated;
     if (isHandoff) {
         await notificationSvc.notifyHumanHandoff({
-            tenant, lead, conversationId: conversation.id, channel: 'whatsapp',
+            tenant, lead, conversationId: conversation?.id, channel: 'whatsapp',
         });
     } else if (['TEST_DRIVE', 'FINANCE', 'SERVICE_BOOKING', 'TRADE_IN'].includes(analysis.intent)) {
         await notificationSvc.notifyLeadQualified({
-            tenant, lead, conversationId: conversation.id, intent: analysis.intent, channel: 'whatsapp',
+            tenant, lead, conversationId: conversation?.id, intent: analysis.intent, channel: 'whatsapp',
         });
     }
 }

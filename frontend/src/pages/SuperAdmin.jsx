@@ -6,7 +6,7 @@ import { Shield, TrendingUp, Users, Eye, CheckCircle, Key } from 'lucide-react';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const SuperAdmin = () => {
-    const { user } = useAuth();
+    useAuth();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ const SuperAdmin = () => {
             } else {
                 alert(resData.error || 'Failed to impersonate');
             }
-        } catch (err) {
+        } catch {
             alert('Network error');
         }
     };
@@ -64,7 +64,6 @@ const SuperAdmin = () => {
                 style={{ background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-0.5 text-red-400">Restricted</p>
                         <h1 className="font-outfit font-black text-xl text-white flex items-center gap-2">
                             <Shield className="text-red-400" size={20} /> KenganAuto SuperAdmin
                         </h1>
@@ -77,7 +76,7 @@ const SuperAdmin = () => {
                         <Key size={14} /> Global API Config
                     </button>
                 </div>
-                <div className="flex items-center justify-end gap-1.5 mt-2 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                <div className="flex items-center justify-end gap-1.5 mt-2 text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
                     <CheckCircle size={12} /> Database Backups Active
                 </div>
             </header>
@@ -89,20 +88,20 @@ const SuperAdmin = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="p-6 rounded-2xl bg-[#111A30] border border-white/5 relative overflow-hidden">
                             <TrendingUp className="absolute top-4 right-4 text-emerald-400/10" size={80} />
-                            <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-2">Total MRR</p>
+                            <p className="text-white/58 text-xs font-bold uppercase tracking-wider mb-2">Total MRR</p>
                             <h4 className="text-4xl font-outfit font-black text-emerald-400 mb-1 leading-none">
                                 R {(data.mrr_zar).toLocaleString()}
                             </h4>
-                            <p className="text-[10px] text-white/40 mt-1 uppercase tracking-widest">Monthly Recurring Revenue</p>
+                            <p className="text-[11px] text-white/58 mt-1 uppercase tracking-widest">Monthly Recurring Revenue</p>
                         </div>
 
                         <div className="p-6 rounded-2xl bg-[#111A30] border border-white/5 relative overflow-hidden">
-                            <Users className="absolute top-4 right-4 text-[#C9A84C]/10" size={80} />
-                            <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-2">Total Tenants</p>
+                            <Users className="absolute top-4 right-4 text-[#C9A84C]/80" size={80} />
+                            <p className="text-white/58 text-xs font-bold uppercase tracking-wider mb-2">Total Tenants</p>
                             <h4 className="text-4xl font-outfit font-black text-white mb-1 leading-none">
                                 {data.total_tenants}
                             </h4>
-                            <p className="text-[10px] text-white/40 mt-1 uppercase tracking-widest">Active Dealerships Hosted</p>
+                            <p className="text-[11px] text-white/58 mt-1 uppercase tracking-widest">Active Dealerships Hosted</p>
                         </div>
                     </div>
 
@@ -112,24 +111,24 @@ const SuperAdmin = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-white/5 bg-[#0B1120]">
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">ID</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">Dealership Name</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">Subdomain</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">Plan</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">Status</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">MRR</th>
-                                    <th className="p-4 text-xs font-bold text-white/50 uppercase tracking-widest">Actions</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">ID</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">Dealership Name</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">Subdomain</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">Plan</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">Status</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">MRR</th>
+                                    <th className="p-4 text-xs font-bold text-white/58 uppercase tracking-widest">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="text-sm text-white/80">
                                 {data.tenants.map(t => (
                                     <tr key={t.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                        <td className="p-4 font-mono text-white/40">{t.id}</td>
+                                        <td className="p-4 font-mono text-white/58">{t.id}</td>
                                         <td className="p-4 font-bold text-white">{t.name}</td>
                                         <td className="p-4 text-[#C9A84C]">{t.subdomain}</td>
                                         <td className="p-4 uppercase text-xs">{t.plan}</td>
                                         <td className="p-4">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black ${t.status === 'active' ? 'bg-emerald-400/20 text-emerald-400' :
+                                            <span className={`px-2 py-0.5 rounded text-[11px] uppercase font-black ${t.status === 'active' ? 'bg-emerald-400/20 text-emerald-400' :
                                                 t.status === 'trialing' ? 'bg-blue-400/20 text-blue-400' :
                                                     'bg-red-400/20 text-red-400'
                                                 }`}>
@@ -139,7 +138,7 @@ const SuperAdmin = () => {
                                         <td className="p-4 text-emerald-400 font-mono">R{t.mrr.toLocaleString()}</td>
                                         <td className="p-4">
                                             <button onClick={() => handleImpersonate(t.id)}
-                                                className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase flex items-center gap-1 transition-colors">
+                                                className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-[11px] font-black uppercase flex items-center gap-1 transition-colors">
                                                 <Eye size={12} /> Impersonate
                                             </button>
                                         </td>
@@ -147,7 +146,7 @@ const SuperAdmin = () => {
                                 ))}
                                 {data.tenants.length === 0 && (
                                     <tr>
-                                        <td colSpan="7" className="p-8 text-center text-white/40">No dealerships found.</td>
+                                        <td colSpan="7" className="p-8 text-center text-white/58">No dealerships found.</td>
                                     </tr>
                                 )}
                             </tbody>

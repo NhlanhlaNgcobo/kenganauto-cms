@@ -1,0 +1,14 @@
+{
+  "workspace": "C:\\Users\\NhlanhlaNgcobo\\OneDrive\\Desktop\\KenganAuto OS\\tmp\\presentations\\kenganauto-client-overview",
+  "pptx": "C:\\Users\\NhlanhlaNgcobo\\OneDrive\\Desktop\\KenganAuto OS\\tmp\\presentations\\kenganauto-client-overview\\output\\output.pptx",
+  "checks": {
+    "output_hygiene": {
+      "output_dir": "C:\\Users\\NhlanhlaNgcobo\\OneDrive\\Desktop\\KenganAuto OS\\tmp\\presentations\\kenganauto-client-overview\\output",
+      "unexpected_files": []
+    }
+  },
+  "failures": [
+    "PPTX package inspection failed: unzip -Z1 C:\\Users\\NhlanhlaNgcobo\\OneDrive\\Desktop\\KenganAuto OS\\tmp\\presentations\\kenganauto-client-overview\\output\\output.pptx failed"
+  ],
+  "warnings": []
+}

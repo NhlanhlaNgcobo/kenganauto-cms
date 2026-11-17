@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Code, Copy, Check, Settings, Palette, MessageSquare,
     Globe, Smartphone, Zap, ChevronRight, ExternalLink,
     RefreshCw, AlertCircle, BookOpen, Webhook,
     Monitor, Layout, ArrowRight
 } from 'lucide-react';
+
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -23,7 +24,7 @@ const ColorSwatch = ({ value, onChange, label }) => (
         </div>
         <div>
             <p className="text-xs font-bold text-white">{label}</p>
-            <p className="text-[10px] text-white/30 font-mono">{value}</p>
+            <p className="text-[12px] text-white/58 font-mono">{value}</p>
         </div>
     </div>
 );
@@ -55,12 +56,12 @@ const WidgetPreview = ({ cfg }) => {
                 </div>
                 <div className="flex-1">
                     <p className="text-sm font-bold text-white leading-none">{cfg.widget_title}</p>
-                    <p className="text-[10px] text-white/50 mt-0.5 flex items-center gap-1">
+                    <p className="text-[12px] text-white/58 mt-0.5 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span>
                         Online · AI-powered
                     </p>
                 </div>
-                <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white/50 text-xs">✕</div>
+                <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center text-white/58 text-xs">✕</div>
             </div>
 
             {/* Messages */}
@@ -70,28 +71,28 @@ const WidgetPreview = ({ cfg }) => {
                         style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.85)' }}>
                         {cfg.greeting.slice(0, 80)}{cfg.greeting.length > 80 ? '…' : ''}
                     </div>
-                    <div className="text-[9px] text-white/20 mt-1">14:32</div>
+                    <div className="text-[12px] text-white/58 mt-1">14:32</div>
                 </div>
                 <div className="max-w-[75%] self-end">
                     <div className="px-3 py-2.5 rounded-2xl rounded-br-none text-[12px] font-medium"
                         style={{ background: cfg.accent_color, color: '#0A0F1E' }}>
                         Tell me more about your SUVs
                     </div>
-                    <div className="text-[9px] text-white/20 mt-1 text-right">14:33</div>
+                    <div className="text-[12px] text-white/58 mt-1 text-right">14:33</div>
                 </div>
                 <div className="max-w-[85%]">
                     <div className="px-3 py-2.5 rounded-2xl rounded-tl-none text-[12px] leading-relaxed"
                         style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.85)' }}>
                         Absolutely! We have 3 stunning SUV models in stock right now…
                     </div>
-                    <div className="text-[9px] text-white/20 mt-1">14:33</div>
+                    <div className="text-[12px] text-white/58 mt-1">14:33</div>
                 </div>
             </div>
 
             {/* Input bar preview */}
             <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 px-3 py-3"
                 style={{ background: 'rgba(0,0,0,0.25)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <div className="flex-1 rounded-xl px-3 py-2 text-[11px] text-white/30"
+                <div className="flex-1 rounded-xl px-3 py-2 text-[12px] text-white/58"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     Type a message…
                 </div>
@@ -158,7 +159,7 @@ const WidgetSettingsPage = () => {
             });
             setCfg(res.data);
             setTenantId(res.data.tenant_id || 'YOUR_TENANT_ID');
-        } catch (err) {
+        } catch {
             // Use defaults if no config saved yet
         } finally {
             setLoading(false);
@@ -206,10 +207,9 @@ const WidgetSettingsPage = () => {
                         <div className="p-2 rounded-xl" style={{ background: 'rgba(59,127,245,0.1)', border: '1px solid rgba(59,127,245,0.2)' }}>
                             <Globe size={20} className="text-[#3B7FF5]" />
                         </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: 'rgba(201,168,76,0.5)' }}>Integration</p>
                     </div>
                     <h1 className="font-outfit font-black text-3xl text-white">Website <span className="gold-text">Chat Widget</span></h1>
-                    <p className="text-sm mt-2" style={{ color: 'rgba(240,237,232,0.45)' }}>
+                    <p className="text-sm mt-3" style={{ color: 'rgba(240,237,232,0.62)' }}>
                         One line of code. Your AI chatbot live on any dealership website.
                     </p>
                 </div>
@@ -248,7 +248,7 @@ const WidgetSettingsPage = () => {
                                     background: 'rgba(201,168,76,0.1)',
                                     color: '#C9A84C',
                                     border: '1px solid rgba(201,168,76,0.2)'
-                                } : { color: 'rgba(240,237,232,0.35)' }}
+                                } : { color: 'rgba(240,237,232,0.62)' }}
                             >
                                 <tab.icon size={14} />
                                 <span className="hidden sm:inline">{tab.label}</span>
@@ -260,7 +260,7 @@ const WidgetSettingsPage = () => {
                     {activeTab === 'appearance' && (
                         <div className="luxury-card p-8 space-y-8">
                             <div>
-                                <h3 className="font-outfit font-bold text-lg text-white mb-6">Colours & Branding</h3>
+                                <h2 className="font-outfit font-bold text-lg text-white mb-6">Colours & Branding</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <ColorSwatch value={cfg.bubble_color} onChange={v => updateCfg('bubble_color', v)} label="Bubble Colour" />
                                     <ColorSwatch value={cfg.accent_color} onChange={v => updateCfg('accent_color', v)} label="Accent Colour" />
@@ -271,7 +271,7 @@ const WidgetSettingsPage = () => {
 
                             <div className="space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Dealership Name</label>
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Dealership Name</label>
                                     <input
                                         className="luxury-input w-full"
                                         value={cfg.dealership_name}
@@ -280,7 +280,7 @@ const WidgetSettingsPage = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Widget Title</label>
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Widget Title</label>
                                     <input
                                         className="luxury-input w-full"
                                         value={cfg.widget_title}
@@ -289,7 +289,7 @@ const WidgetSettingsPage = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Logo URL (optional)</label>
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Logo URL (optional)</label>
                                     <input
                                         className="luxury-input w-full"
                                         value={cfg.logo_url || ''}
@@ -302,7 +302,7 @@ const WidgetSettingsPage = () => {
                             <div className="gold-divider" />
 
                             <div className="space-y-3">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Position</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Position</label>
                                 <div className="grid grid-cols-2 gap-3">
                                     {['bottom-right', 'bottom-left'].map(pos => (
                                         <button
@@ -316,7 +316,7 @@ const WidgetSettingsPage = () => {
                                             } : {
                                                 background: 'rgba(255,255,255,0.03)',
                                                 border: '1px solid rgba(255,255,255,0.08)',
-                                                color: 'rgba(240,237,232,0.5)'
+                                                color: 'rgba(240,237,232,0.62)'
                                             }}
                                         >
                                             <Layout size={16} />
@@ -331,10 +331,10 @@ const WidgetSettingsPage = () => {
                     {/* ── BEHAVIOUR TAB ── */}
                     {activeTab === 'behaviour' && (
                         <div className="luxury-card p-8 space-y-6">
-                            <h3 className="font-outfit font-bold text-lg text-white">Chatbot Behaviour</h3>
+                            <h2 className="font-outfit font-bold text-lg text-white">Chatbot Behaviour</h2>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Opening Greeting</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Opening Greeting</label>
                                 <textarea
                                     className="luxury-input w-full"
                                     rows={3}
@@ -346,7 +346,7 @@ const WidgetSettingsPage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Offline Message</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Offline Message</label>
                                 <textarea
                                     className="luxury-input w-full"
                                     rows={2}
@@ -357,7 +357,7 @@ const WidgetSettingsPage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Business Hours</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Business Hours</label>
                                 <input
                                     className="luxury-input w-full"
                                     value={cfg.business_hours}
@@ -367,7 +367,7 @@ const WidgetSettingsPage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">WhatsApp Number (for CTA)</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">WhatsApp Number (for CTA)</label>
                                 <input
                                     className="luxury-input w-full"
                                     value={cfg.whatsapp_number || ''}
@@ -375,11 +375,11 @@ const WidgetSettingsPage = () => {
                                     placeholder="+27 82 000 1234"
                                     type="tel"
                                 />
-                                <p className="text-[10px] text-white/25">After 2 AI messages, a "Continue on WhatsApp" button appears.</p>
+                                <p className="text-[12px] text-white/58">After 2 AI messages, a "Continue on WhatsApp" button appears.</p>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Auto-Open Delay (seconds, 0 = disabled)</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Auto-Open Delay (seconds, 0 = disabled)</label>
                                 <input
                                     className="luxury-input w-full"
                                     type="number"
@@ -393,7 +393,7 @@ const WidgetSettingsPage = () => {
                             <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <div>
                                     <p className="text-sm font-bold text-white">Collect Name & Phone</p>
-                                    <p className="text-xs text-white/35 mt-0.5">Show lead capture form before first message</p>
+                                    <p className="text-xs text-white/58 mt-0.5">Show lead capture form before first message</p>
                                 </div>
                                 <button
                                     onClick={() => updateCfg('show_lead_form', !cfg.show_lead_form)}
@@ -416,16 +416,16 @@ const WidgetSettingsPage = () => {
                                     <div className="p-2 rounded-xl" style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.2)' }}>
                                         <Globe size={16} className="text-green-400" />
                                     </div>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Production Embed Code</h3>
+                                    <h2 className="font-outfit font-bold text-lg text-white">Production Embed Code</h2>
                                 </div>
-                                <p className="text-sm text-white/40 mb-4">Copy this single line and paste it before the <code className="text-[#C9A84C]">&lt;/body&gt;</code> tag on any webpage.</p>
+                                <p className="text-sm text-white/58 mb-4">Copy this single line and paste it before the <code className="text-[#C9A84C]">&lt;/body&gt;</code> tag on any webpage.</p>
                                 <div className="relative p-4 rounded-xl font-mono text-xs break-all"
                                     style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(201,168,76,0.15)', color: '#4ADE80' }}>
                                     {embedCode}
                                     <button onClick={copyEmbed}
                                         className="absolute top-3 right-3 p-2 rounded-lg transition-all"
                                         style={{ background: copiedEmbed ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.07)' }}>
-                                        {copiedEmbed ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-white/40" />}
+                                        {copiedEmbed ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-white/58" />}
                                     </button>
                                 </div>
                             </div>
@@ -436,16 +436,16 @@ const WidgetSettingsPage = () => {
                                     <div className="p-2 rounded-xl" style={{ background: 'rgba(59,127,245,0.1)', border: '1px solid rgba(59,127,245,0.2)' }}>
                                         <Monitor size={16} className="text-[#3B7FF5]" />
                                     </div>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Local Development</h3>
+                                    <h2 className="font-outfit font-bold text-lg text-white">Local Development</h2>
                                 </div>
-                                <p className="text-sm text-white/40 mb-4">Use this for testing on localhost:</p>
+                                <p className="text-sm text-white/58 mb-4">Use this for testing on localhost:</p>
                                 <div className="relative p-4 rounded-xl font-mono text-xs break-all"
                                     style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(59,127,245,0.15)', color: '#60A5FA' }}>
                                     {localEmbedCode}
                                     <button onClick={copyLocal}
                                         className="absolute top-3 right-3 p-2 rounded-lg transition-all"
                                         style={{ background: copiedLocal ? 'rgba(59,127,245,0.2)' : 'rgba(255,255,255,0.07)' }}>
-                                        {copiedLocal ? <Check size={14} className="text-[#3B7FF5]" /> : <Copy size={14} className="text-white/40" />}
+                                        {copiedLocal ? <Check size={14} className="text-[#3B7FF5]" /> : <Copy size={14} className="text-white/58" />}
                                     </button>
                                 </div>
                             </div>
@@ -454,7 +454,7 @@ const WidgetSettingsPage = () => {
                             <div className="luxury-card p-8">
                                 <div className="flex items-center gap-2 mb-6">
                                     <BookOpen size={18} className="text-[#C9A84C]" />
-                                    <h3 className="font-outfit font-bold text-lg text-white">Installation Guides</h3>
+                                    <h2 className="font-outfit font-bold text-lg text-white">Installation Guides</h2>
                                 </div>
                                 {[
                                     {
@@ -491,11 +491,11 @@ const WidgetSettingsPage = () => {
                                     <div key={platform} className="mb-6 last:mb-0">
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className="text-lg">{icon}</span>
-                                            <h4 className="font-bold text-white text-sm">{platform}</h4>
+                                            <h3 className="font-bold text-white text-sm">{platform}</h3>
                                         </div>
                                         <ol className="space-y-2">
                                             {steps.map((step, i) => (
-                                                <li key={i} className="flex items-start gap-3 text-xs text-white/45">
+                                                <li key={i} className="flex items-start gap-3 text-xs text-white/58">
                                                     <span className="font-black text-[#C9A84C] flex-shrink-0 mt-0.5">{i + 1}.</span>
                                                     {step}
                                                 </li>
@@ -516,8 +516,8 @@ const WidgetSettingsPage = () => {
                                         <Webhook size={18} className="text-orange-400" />
                                     </div>
                                     <div>
-                                        <h3 className="font-outfit font-bold text-lg text-white">Autotrader / Cars.co.za Integration</h3>
-                                        <p className="text-xs text-white/35 mt-0.5">Auto-reply to enquiries within 60 seconds via WhatsApp AI</p>
+                                        <h2 className="font-outfit font-bold text-lg text-white">Autotrader / Cars.co.za Integration</h2>
+                                        <p className="text-xs text-white/58 mt-0.5">Auto-reply to enquiries within 60 seconds via WhatsApp AI</p>
                                     </div>
                                 </div>
 
@@ -526,10 +526,10 @@ const WidgetSettingsPage = () => {
                                     <div className="flex items-stretch gap-2 mt-3 flex-wrap">
                                         {['Buyer enquires on Autotrader', 'Email forwarded to webhook', 'AI parses lead details', 'WhatsApp reply sent in &lt;60s'].map((step, i) => (
                                             <React.Fragment key={i}>
-                                                <div className="flex-1 min-w-[100px] p-3 rounded-lg text-center text-[11px] text-white/70 font-medium"
+                                                <div className="flex-1 min-w-[100px] p-3 rounded-lg text-center text-[12px] text-white/70 font-medium"
                                                     style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
                                                     dangerouslySetInnerHTML={{ __html: step }} />
-                                                {i < 3 && <div className="flex items-center text-white/20"><ArrowRight size={14} /></div>}
+                                                {i < 3 && <div className="flex items-center text-white/58"><ArrowRight size={14} /></div>}
                                             </React.Fragment>
                                         ))}
                                     </div>
@@ -537,22 +537,22 @@ const WidgetSettingsPage = () => {
 
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Your Webhook URL</label>
-                                        <p className="text-xs text-white/30 mb-2">Configure your email forwarder (Zapier, Make, etc.) to POST parsed lead data to this URL:</p>
+                                        <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Your Webhook URL</label>
+                                        <p className="text-xs text-white/58 mb-2">Configure your email forwarder (Zapier, Make, etc.) to POST parsed lead data to this URL:</p>
                                         <div className="relative p-4 rounded-xl font-mono text-xs break-all"
                                             style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(251,146,60,0.2)', color: '#FB923C' }}>
                                             {webhookUrl}
                                             <button onClick={copyWebhook}
                                                 className="absolute top-3 right-3 p-2 rounded-lg"
                                                 style={{ background: copiedWebhook ? 'rgba(251,146,60,0.2)' : 'rgba(255,255,255,0.07)' }}>
-                                                {copiedWebhook ? <Check size={14} className="text-orange-400" /> : <Copy size={14} className="text-white/40" />}
+                                                {copiedWebhook ? <Check size={14} className="text-orange-400" /> : <Copy size={14} className="text-white/58" />}
                                             </button>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold uppercase tracking-widest text-white/40 block">Expected JSON Payload</label>
-                                        <pre className="p-4 rounded-xl text-[11px] overflow-x-auto leading-relaxed"
+                                        <label className="text-[11px] font-bold uppercase tracking-widest text-white/58 block">Expected JSON Payload</label>
+                                        <pre className="p-4 rounded-xl text-[12px] overflow-x-auto leading-relaxed"
                                             style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(240,237,232,0.6)' }}>
                                             {`{
   "tenant_id": "${tenantId}",
@@ -571,8 +571,8 @@ const WidgetSettingsPage = () => {
 
                                     <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                         <p className="text-xs font-bold text-white mb-2">🔒 Security Header Required</p>
-                                        <p className="text-xs text-white/40">Include the header: <code className="text-[#C9A84C]">x-webhook-secret: at-webhook-secret</code></p>
-                                        <p className="text-[10px] text-white/25 mt-1">Set a strong secret via the <code>AUTOTRADER_WEBHOOK_SECRET</code> env variable on the server.</p>
+                                        <p className="text-xs text-white/58">Include the header: <code className="text-[#C9A84C]">x-webhook-secret: at-webhook-secret</code></p>
+                                        <p className="text-[12px] text-white/58 mt-1">Set a strong secret via the <code>AUTOTRADER_WEBHOOK_SECRET</code> env variable on the server.</p>
                                     </div>
                                 </div>
                             </div>
@@ -583,10 +583,10 @@ const WidgetSettingsPage = () => {
                 {/* Right: Live Preview */}
                 <div className="xl:col-span-2">
                     <div className="sticky top-8 space-y-4">
-                        <div className="luxury-card p-6">
+                        <div>
                             <div className="flex items-center gap-2 mb-5">
                                 <Smartphone size={16} className="text-[#C9A84C]" />
-                                <h3 className="font-outfit font-bold text-base text-white">Live Preview</h3>
+                                <h2 className="font-outfit font-bold text-base text-white">Live Preview</h2>
                             </div>
                             <div className="flex justify-center">
                                 <WidgetPreview cfg={cfg} />
@@ -595,7 +595,7 @@ const WidgetSettingsPage = () => {
 
                         {/* Quick Stats */}
                         <div className="luxury-card p-6">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-4">Widget Info</p>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-white/58 mb-4">Widget Info</p>
                             <ul className="space-y-3">
                                 {[
                                     ['Bundle Size', '< 50kb'],
@@ -606,7 +606,7 @@ const WidgetSettingsPage = () => {
                                     ['WhatsApp CTA', cfg.whatsapp_number ? '✓ Configured' : '⚠ Not set'],
                                 ].map(([k, v]) => (
                                     <li key={k} className="flex items-center justify-between">
-                                        <span className="text-xs text-white/35">{k}</span>
+                                        <span className="text-xs text-white/58">{k}</span>
                                         <span className="text-xs font-bold text-white">{v}</span>
                                     </li>
                                 ))}

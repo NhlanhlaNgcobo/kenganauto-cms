@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-    Car, Search, Filter, Camera, DollarSign, ArrowRight, Save, Clock, Target, CreditCard, ChevronRight, X
+    Car, Search, Camera, DollarSign, Save, Target, ChevronRight, X
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -42,9 +42,7 @@ export default function TradeIns() {
     const [offerAmount, setOfferAmount] = useState('');
     const [updating, setUpdating] = useState(false);
 
-    useEffect(() => { loadTradeIns(); }, []);
-
-    const loadTradeIns = async () => {
+    async function loadTradeIns() {
         setLoading(true);
         try {
             const res = await axios.get(`${API_URL}/api/trade-ins`);
@@ -54,7 +52,9 @@ export default function TradeIns() {
             setTradeIns(MOCK_TRADE_INS);
         }
         setLoading(false);
-    };
+    }
+
+    useEffect(() => { loadTradeIns(); }, []);
 
     const handleUpdateOffer = async (id, status, whatsapp) => {
         setUpdating(true);
@@ -67,7 +67,7 @@ export default function TradeIns() {
             const updated = res.data.trade_in;
             setTradeIns(prev => prev.map(t => t.id === id ? { ...t, dealer_offer: updated.dealer_offer, status: updated.status } : t));
             setSelectedTrade(prev => ({ ...prev, dealer_offer: updated.dealer_offer, status: updated.status }));
-        } catch (err) {
+        } catch {
             // Mock mode fallback update
             setTradeIns(prev => prev.map(t => t.id === id ? { ...t, dealer_offer: offerAmount, status } : t));
             setSelectedTrade(prev => ({ ...prev, dealer_offer: offerAmount, status }));
@@ -95,7 +95,6 @@ export default function TradeIns() {
                 <header className="px-8 py-5 flex items-center justify-between z-10"
                     style={{ background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>Module</p>
                         <h1 className="font-outfit font-black text-xl text-white">Trade-In Pipeline</h1>
                     </div>
                 </header>
@@ -105,10 +104,10 @@ export default function TradeIns() {
                     <div className="flex items-center gap-2">
                         {['all', 'enquiry', 'valued', 'inspection_booked', 'offer_made', 'accepted'].map(s => (
                             <button key={s} onClick={() => setStatusFilter(s)}
-                                className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase transition-all"
+                                className="px-3 py-1.5 rounded-full text-[11px] font-bold uppercase transition-all"
                                 style={{
                                     background: statusFilter === s ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.03)',
-                                    color: statusFilter === s ? '#C9A84C' : 'rgba(240,237,232,0.4)',
+                                    color: statusFilter === s ? '#C9A84C' : 'rgba(240,237,232,0.66)',
                                     border: `1px solid ${statusFilter === s ? 'rgba(201,168,76,0.3)' : 'transparent'}`
                                 }}>
                                 {s.replace('_', ' ')}
@@ -117,7 +116,7 @@ export default function TradeIns() {
                     </div>
 
                     <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.3)' }} />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.62)' }} />
                         <input
                             type="text"
                             placeholder="Search vehicle or customer..."
@@ -131,9 +130,9 @@ export default function TradeIns() {
                 {/* List View */}
                 <div className="flex-1 overflow-y-auto p-8">
                     {loading ? (
-                        <div className="text-center text-white/40 mt-10 text-xs">Loading trade-ins...</div>
+                        <div className="text-center text-white/58 mt-10 text-xs">Loading trade-ins...</div>
                     ) : filtered.length === 0 ? (
-                        <div className="text-center text-white/40 mt-10 text-xs">No trade-ins found matching criteria.</div>
+                        <div className="text-center text-white/58 mt-10 text-xs">No trade-ins found matching criteria.</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filtered.map(t => (
@@ -146,9 +145,9 @@ export default function TradeIns() {
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <p className="font-outfit font-black text-lg text-white mb-1 group-hover:text-[#C9A84C] transition-colors">{t.year} {t.make} {t.model}</p>
-                                            <p className="text-[10px] text-white/50">{t.lead?.customer_name || 'Unknown'} · {t.lead?.customer_phone || '-'}</p>
+                                            <p className="text-[12px] text-white/58">{t.lead?.customer_name || 'Unknown'} · {t.lead?.customer_phone || '-'}</p>
                                         </div>
-                                        <span className="px-2 py-1 rounded-full text-[9px] font-bold uppercase"
+                                        <span className="px-2 py-1 rounded-full text-[11px] font-bold uppercase"
                                             style={{
                                                 background: STATUS_COLORS[t.status]?.bg,
                                                 color: STATUS_COLORS[t.status]?.text,
@@ -160,27 +159,27 @@ export default function TradeIns() {
 
                                     <div className="grid grid-cols-3 gap-2 mb-4">
                                         <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5">
-                                            <p className="text-[8px] uppercase tracking-widest text-white/30">Mileage</p>
+                                            <p className="text-[11px] uppercase tracking-widest text-white/58">Mileage</p>
                                             <p className="text-xs font-bold text-white mt-0.5">{t.mileage ? `${(t.mileage / 1000).toFixed(0)}k km` : '-'}</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5">
-                                            <p className="text-[8px] uppercase tracking-widest text-white/30">Condition</p>
+                                            <p className="text-[11px] uppercase tracking-widest text-white/58">Condition</p>
                                             <p className="text-xs font-bold text-white mt-0.5">{t.condition || '-'}</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5 flex flex-col justify-center items-center">
-                                            <p className="text-[8px] uppercase tracking-widest text-white/30 mb-0.5">Photos</p>
+                                            <p className="text-[11px] uppercase tracking-widest text-white/58 mb-0.5">Photos</p>
                                             <p className="text-xs font-bold text-white flex items-center gap-1"><Camera size={10} /> {t.photos?.length || 0}</p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center justify-between pt-3 border-t border-white/5">
                                         <div>
-                                            <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1">AI Estimate</p>
+                                            <p className="text-[11px] uppercase tracking-widest text-white/58 mb-1">AI Estimate</p>
                                             <p className="text-sm font-black text-white">R {t.estimated_value?.toLocaleString()}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1">Actual Offer</p>
-                                            <p className="text-sm font-black" style={{ color: t.dealer_offer ? '#4ADE80' : 'rgba(255,255,255,0.2)' }}>
+                                            <p className="text-[11px] uppercase tracking-widest text-white/58 mb-1">Actual Offer</p>
+                                            <p className="text-sm font-black" style={{ color: t.dealer_offer ? '#4ADE80' : 'rgba(255,255,255,0.66)' }}>
                                                 {t.dealer_offer ? `R ${t.dealer_offer.toLocaleString()}` : 'Pending'}
                                             </p>
                                         </div>
@@ -207,7 +206,7 @@ export default function TradeIns() {
                                 </div>
                                 <h3 className="font-outfit font-black text-lg">Trade-In Details</h3>
                             </div>
-                            <button onClick={() => setSelectedTrade(null)} className="p-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition">
+                            <button onClick={() => setSelectedTrade(null)} className="p-2 rounded-full hover:bg-white/10 text-white/66 hover:text-white transition">
                                 <X size={20} />
                             </button>
                         </div>
@@ -225,8 +224,8 @@ export default function TradeIns() {
 
                             {/* Status Tag */}
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] uppercase font-black text-white/40">Status:</span>
-                                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-lg"
+                                <span className="text-[11px] uppercase font-black text-white/58">Status:</span>
+                                <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase shadow-lg"
                                     style={{
                                         background: STATUS_COLORS[selectedTrade.status]?.bg,
                                         color: STATUS_COLORS[selectedTrade.status]?.text,
@@ -242,26 +241,26 @@ export default function TradeIns() {
                             <div className="p-5 rounded-xl text-center relative overflow-hidden"
                                 style={{ background: 'linear-gradient(135deg, rgba(59,127,245,0.05), rgba(59,127,245,0.15))', border: '1px solid rgba(59,127,245,0.2)' }}>
                                 <div className="absolute top-0 right-0 p-2"><Target size={14} className="text-blue-400 opacity-50" /></div>
-                                <p className="text-[10px] uppercase font-black tracking-widest text-blue-400 mb-2">Automated AI Valuation Estimate</p>
-                                <h3 className="font-outfit font-black text-3xl text-white mb-2">R {selectedTrade.estimated_value?.toLocaleString()}</h3>
-                                <p className="text-[10px] text-white/60">Calculated based on average market pricing for {selectedTrade.make} {selectedTrade.model} with similar age/mileage.</p>
+                                <p className="text-sm font-semibold text-blue-300 mb-1">AI valuation estimate</p>
+                                <p className="font-outfit font-black text-3xl text-white mb-2 tabular-nums">R {selectedTrade.estimated_value?.toLocaleString('en-ZA')}</p>
+                                <p className="text-[12px] text-white/66">Calculated based on average market pricing for {selectedTrade.make} {selectedTrade.model} with similar age/mileage.</p>
                             </div>
 
                             <hr className="border-white/5" />
 
                             {/* Photos Placeholder */}
                             <div>
-                                <h4 className="font-bold text-xs uppercase tracking-widest text-white/50 mb-3 flex items-center gap-2"><Camera size={12} /> Customer Photos ({selectedTrade.photos?.length || 0})</h4>
+                                <h4 className="font-bold text-xs uppercase tracking-widest text-white/58 mb-3 flex items-center gap-2"><Camera size={12} /> Customer Photos ({selectedTrade.photos?.length || 0})</h4>
                                 {selectedTrade.photos?.length ? (
                                     <div className="grid grid-cols-2 gap-2">
                                         {selectedTrade.photos.map((p, i) => (
-                                            <div key={i} className="aspect-video rounded-lg bg-black/50 border border-white/10 flex items-center justify-center text-[10px] text-white/30 truncate px-2">
+                                            <div key={i} className="aspect-video rounded-lg bg-black/50 border border-white/10 flex items-center justify-center text-[12px] text-white/58 truncate px-2">
                                                 📷 Image received via WhatsApp
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="w-full py-8 rounded-xl border border-dashed border-white/20 text-center text-white/30 text-xs">
+                                    <div className="w-full py-8 rounded-xl border border-dashed border-white/20 text-center text-white/58 text-xs">
                                         No photos uploaded yet.
                                     </div>
                                 )}
@@ -278,7 +277,7 @@ export default function TradeIns() {
                                     { label: 'Damage', value: selectedTrade.accident_damage || 'No' },
                                 ].map((stat, i) => (
                                     <div key={i} className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <p className="text-[9px] uppercase font-black text-white/30 tracking-widest mb-1">{stat.label}</p>
+                                        <p className="text-[11px] uppercase font-black text-white/58 tracking-widest mb-1">{stat.label}</p>
                                         <p className="text-sm font-bold text-white">{stat.value}</p>
                                     </div>
                                 ))}
@@ -288,7 +287,7 @@ export default function TradeIns() {
 
                         {/* Action Panel: Make Offer */}
                         <div className="p-6 bg-black/40 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                            <p className="text-[10px] uppercase font-black text-white/50 tracking-widest mb-3 flex items-center gap-2"><DollarSign size={12} /> Make Actual Offer</p>
+                            <p className="text-[11px] uppercase font-black text-white/58 tracking-widest mb-3 flex items-center gap-2"><DollarSign size={12} /> Make Actual Offer</p>
 
                             <div className="flex gap-3 mb-4">
                                 <div className="relative flex-1">

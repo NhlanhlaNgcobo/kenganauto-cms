@@ -42,3 +42,9 @@ yarn-error.log*
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Customer vehicle photos from service inspections
+backend/uploads/
+
+# Contains live API keys; never commit
+API connections*.docx

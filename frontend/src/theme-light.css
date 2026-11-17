@@ -1,0 +1,218 @@
+/* ═══════════════════════════════════════════════════════════════
+   KENGAN AUTO — LIGHT THEME
+   Activated by <html data-theme="light"> (see src/utils/theme.js).
+
+   The dashboard was authored dark-first: ~860 `text-white/NN`, `bg-white/NN`,
+   `border-white/NN` utilities. Tailwind v4 compiles all of them to
+   `var(--color-white)`, so redefining that one variable as ink turns every
+   translucent white overlay into the equivalent ink overlay on paper.
+   Everything below handles what the variable swap can't reach: literal hex
+   surfaces, component classes, pale status hues, inline chart styles.
+
+   This file is intentionally UNLAYERED so it beats Tailwind utilities.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --ka-paper: #F3F4F7;
+  --ka-surface: #FFFFFF;
+  --ka-surface-2: #F7F8FA;
+  --ka-ink: #0E1525;
+  --ka-line: rgba(14, 21, 37, 0.1);
+  --ka-gold-ink: #85661A;      /* gold readable as text on white (6.4:1) */
+  --ka-shadow: 0 1px 2px rgba(14, 21, 37, 0.05), 0 4px 18px rgba(14, 21, 37, 0.05);
+
+  /* The core swap: "white" means "ink" in light mode */
+  --color-white: #0E1525;
+
+  /* Theme tokens from index.css @theme */
+  --color-primary: #F3F4F7;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F7F8FA;
+  --color-surface-3: #EEF0F4;
+  --color-text: #0E1525;
+  --color-text-muted: rgba(14, 21, 37, 0.6);
+  --color-border-subtle: rgba(14, 21, 37, 0.08);
+
+  /* Pale status hues were tuned for navy; deepen them so text stays readable */
+  --color-red-200: #B91C1C;   --color-red-300: #B91C1C;   --color-red-400: #C42020;
+  --color-green-300: #15803D; --color-green-400: #15803D;
+  --color-emerald-300: #047857; --color-emerald-400: #047857;
+  --color-blue-300: #1D4ED8;  --color-blue-400: #1D4ED8;
+  --color-sky-300: #0369A1;   --color-sky-400: #0369A1;
+  --color-orange-300: #C2410C; --color-orange-400: #C2410C;
+  --color-amber-300: #B45309; --color-amber-400: #B45309;
+  --color-yellow-300: #A16207; --color-yellow-400: #A16207;
+  --color-violet-300: #6D28D9; --color-violet-400: #6D28D9;
+  --color-purple-300: #7E22CE; --color-purple-400: #7E22CE;
+  --color-rose-300: #BE123C;  --color-rose-400: #BE123C;
+  --color-cyan-300: #0E7490;  --color-cyan-400: #0E7490;
+  --color-teal-300: #0F766E;  --color-teal-400: #0F766E;
+}
+
+/* Solid saturated fills keep white text: reset the variable so descendants inherit real white */
+:root[data-theme="light"] :is(
+  .bg-red-500, .bg-red-600, .bg-red-700, .bg-blue-500, .bg-blue-600, .bg-blue-700,
+  .bg-green-500, .bg-green-600, .bg-emerald-500, .bg-emerald-600, .bg-orange-500,
+  .bg-purple-500, .bg-violet-500, .bg-\[\#10B981\], .bg-\[\#3B7FF5\], .bg-\[\#1877F2\],
+  .btn-accent
+) {
+  --color-white: #FFFFFF;
+}
+
+/* Literal white stays white (QR codes, toggle knobs) */
+:root[data-theme="light"] .bg-white { background-color: #FFFFFF; }
+
+/* ── Page ── */
+:root[data-theme="light"] body {
+  background: var(--ka-paper);
+  background-image: none;
+  color: var(--ka-ink);
+}
+
+/* ── Hard-coded navy surfaces → paper/white ── */
+:root[data-theme="light"] :is(
+  [class*="bg-[#0D1526]"], [class*="bg-[#111A30]"], [class*="bg-[#121A2B]"],
+  [class*="bg-[#0F172A]"], [class*="bg-[#111B30]"], [class*="bg-[#0F162A]"],
+  [class*="bg-[#0B1120]"], [class*="bg-[#080D1A]"], [class*="bg-[#1A2235]"]
+) {
+  background-color: var(--ka-surface);
+}
+:root[data-theme="light"] :is([class*="bg-[#0A0F1E]"], [class*="bg-[#080C17]"], [class*="bg-[#060A14]"]) {
+  background-color: var(--ka-paper);
+}
+/* Cards that were only distinguished by a darker fill need an edge on paper */
+:root[data-theme="light"] :is([class*="bg-[#0D1526]"], [class*="bg-[#121A2B]"], [class*="bg-[#111A30]"]).rounded-3xl,
+:root[data-theme="light"] :is([class*="bg-[#0D1526]"], [class*="bg-[#121A2B]"], [class*="bg-[#111A30]"]).rounded-2xl {
+  box-shadow: var(--ka-shadow);
+}
+:root[data-theme="light"] :is([class*="from-[#0A0F1E]"], [class*="from-[#1A2235]"], [class*="to-[#0B1120]"]) {
+  --tw-gradient-from: var(--ka-surface-2);
+  --tw-gradient-to: var(--ka-surface);
+}
+
+/* Black insets (bg-black/30 wells) → faint ink tint; full-screen scrims stay dark */
+:root[data-theme="light"] [class*="bg-black/"]:not(.fixed):not(.inset-0) {
+  background-color: var(--ka-surface-2);
+}
+:root[data-theme="light"] :is(.fixed, .inset-0)[class*="bg-black/"] {
+  background-color: rgba(14, 21, 37, 0.38);
+}
+
+/* ── Brand gold & accent text ── */
+:root[data-theme="light"] :is(.text-\[\#C9A84C\], .text-\[\#F7D774\], .text-\[\#E5E4E2\]) { color: var(--ka-gold-ink); }
+:root[data-theme="light"] :is(.text-\[\#60A5FA\], .text-\[\#3B7FF5\], .text-\[\#3B82F6\]) { color: #1D4ED8; }
+:root[data-theme="light"] .text-\[\#10B981\] { color: #047857; }
+:root[data-theme="light"] .gold-text { color: var(--ka-gold-ink); }
+
+/* Inline-style colours (role chips, finance calculator, chat sentiment) */
+:root[data-theme="light"] [style*="color: rgb(74, 222, 128)"] { color: #15803D !important; }
+:root[data-theme="light"] [style*="color: rgb(248, 113, 113)"] { color: #B91C1C !important; }
+:root[data-theme="light"] [style*="color: rgb(96, 165, 250)"] { color: #1D4ED8 !important; }
+:root[data-theme="light"] [style*="color: rgb(251, 146, 60)"] { color: #C2410C !important; }
+:root[data-theme="light"] [style*="color: rgb(167, 139, 250)"] { color: #6D28D9 !important; }
+:root[data-theme="light"] [style*="color: rgb(201, 168, 76)"],
+:root[data-theme="light"] [style*="color: rgb(232, 201, 122)"],
+:root[data-theme="light"] [style*="color: rgb(247, 215, 116)"] { color: var(--ka-gold-ink) !important; }
+:root[data-theme="light"] [style*="color: rgb(240, 237, 232)"] { color: var(--ka-ink) !important; }
+:root[data-theme="light"] [style*="color: rgb(148, 163, 184)"] { color: #475569 !important; }
+:root[data-theme="light"] :is([style^="color: rgba(240, 237, 232"], [style*=" color: rgba(240, 237, 232"], [style*=";color: rgba(240, 237, 232"],
+  [style^="color: rgba(255, 255, 255"], [style*=" color: rgba(255, 255, 255"]) { color: rgba(14, 21, 37, 0.66) !important; }
+/* Sticky translucent page headers */
+:root[data-theme="light"] :is([style*="background: rgba(10, 15, 30"], [style*="background-color: rgba(10, 15, 30"],
+  [style*="background: rgba(13, 21, 38"], [style*="background-color: rgba(13, 21, 38"]) {
+  background: rgba(243, 244, 247, 0.88) !important;
+}
+:root[data-theme="light"] [style*="background: rgb(10, 15, 30)"],
+:root[data-theme="light"] [style*="background-color: rgb(10, 15, 30)"],
+:root[data-theme="light"] [style*="background: rgb(13, 21, 38)"],
+:root[data-theme="light"] [style*="background-color: rgb(13, 21, 38)"] { background: var(--ka-surface) !important; }
+
+/* ── Component classes from index.css ── */
+:root[data-theme="light"] :is(.luxury-card, .premium-card, .stat-card) {
+  background: var(--ka-surface);
+  border-color: var(--ka-line);
+  box-shadow: var(--ka-shadow);
+  backdrop-filter: none;
+}
+:root[data-theme="light"] .luxury-card::before { background: none; }
+:root[data-theme="light"] :is(.luxury-card, .premium-card, .stat-card):hover {
+  border-color: rgba(133, 102, 26, 0.3);
+  box-shadow: 0 2px 4px rgba(14, 21, 37, 0.06), 0 10px 30px rgba(14, 21, 37, 0.08);
+}
+:root[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: var(--ka-line);
+}
+
+:root[data-theme="light"] .sidebar-luxury {
+  background: var(--ka-surface);
+  border-right-color: var(--ka-line);
+}
+:root[data-theme="light"] .sidebar-icon-btn { color: rgba(14, 21, 37, 0.74); border-color: transparent; }
+:root[data-theme="light"] .sidebar-icon-btn.active {
+  background: rgba(201, 168, 76, 0.1);
+  color: var(--ka-ink);
+  border-color: rgba(133, 102, 26, 0.28);
+  box-shadow: inset 3px 0 0 #B08A2E;
+}
+:root[data-theme="light"] .sidebar-icon-btn:hover:not(.active) {
+  background: rgba(14, 21, 37, 0.04);
+  color: var(--ka-ink);
+  border-color: var(--ka-line);
+}
+
+:root[data-theme="light"] :is(.lux-input, .luxury-input) {
+  background: var(--ka-surface);
+  border-color: rgba(14, 21, 37, 0.16);
+  color: var(--ka-ink);
+}
+:root[data-theme="light"] :is(.lux-input, .luxury-input)::placeholder { color: rgba(14, 21, 37, 0.5); }
+:root[data-theme="light"] :is(.lux-input, .luxury-input):focus {
+  background: var(--ka-surface);
+  border-color: #B08A2E;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18);
+}
+:root[data-theme="light"] :is(select, input, textarea) option { background: #fff; color: var(--ka-ink); }
+
+:root[data-theme="light"] :is(.btn-gold, .btn-accent) {
+  box-shadow: 0 1px 2px rgba(14, 21, 37, 0.12), 0 4px 12px rgba(14, 21, 37, 0.08);
+}
+
+:root[data-theme="light"] ::selection { background: rgba(201, 168, 76, 0.3); color: var(--ka-ink); }
+:root[data-theme="light"] :is(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline-color: #9A7830;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(14, 21, 37, 0.18); }
+
+/* ── Recharts (inline props can't see CSS variables) ── */
+:root[data-theme="light"] .recharts-default-tooltip {
+  background: #fff !important;
+  border: 1px solid var(--ka-line) !important;
+  border-radius: 10px;
+  box-shadow: var(--ka-shadow);
+  color: var(--ka-ink);
+}
+:root[data-theme="light"] .recharts-default-tooltip .recharts-tooltip-label { color: var(--ka-ink) !important; }
+:root[data-theme="light"] :is(.recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line) { stroke: rgba(14, 21, 37, 0.25); }
+:root[data-theme="light"] .recharts-cartesian-axis-tick-value { fill: #475569; }
+:root[data-theme="light"] .recharts-cartesian-grid line { stroke: rgba(14, 21, 37, 0.08); }
+:root[data-theme="light"] .recharts-legend-item-text { color: #334155 !important; }
+:root[data-theme="light"] .recharts-tooltip-cursor { fill: rgba(14, 21, 37, 0.05); }
+
+/* ── Cross-fade when switching (skipped for reduced motion) ── */
+@media (prefers-reduced-motion: no-preference) {
+  :root.theme-switching,
+  :root.theme-switching *,
+  :root.theme-switching *::before,
+  :root.theme-switching *::after {
+    transition: background-color 0.28s ease, color 0.28s ease, border-color 0.28s ease, fill 0.28s ease, stroke 0.28s ease !important;
+  }
+}
+
+/* Heavy black drop shadows read as smudges on paper */
+:root[data-theme="light"] [class*="shadow-[0_10px_40px_rgba(0,0,0"],
+:root[data-theme="light"] [class*="shadow-[0_20px"] {
+  box-shadow: 0 2px 6px rgba(14, 21, 37, 0.08), 0 8px 24px rgba(14, 21, 37, 0.08);
+}

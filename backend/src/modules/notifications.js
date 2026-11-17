@@ -24,11 +24,14 @@ router.get('/settings', authenticate, (req, res) => {
 });
 
 /* ─────────────────────────────────────────────────────────────
-   PUT /api/notifications/settings
+   PUT /api/notifications/settings  — Admin only
    ───────────────────────────────────────────────────────────── */
 router.put('/settings', authenticate, (req, res) => {
     try {
-        // Only admin / DP should technically manage global routing, but open for demo
+        // Only admins and dealer principals should manage global notification routing
+        if (!['admin'].includes(req.user.role)) {
+            return res.status(403).json({ error: 'Only administrators can update notification settings.' });
+        }
         notificationService.updateSettings(req.body);
         res.json({ success: true, settings: notificationService.getSettings() });
     } catch (e) {

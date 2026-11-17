@@ -8,17 +8,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 const PLANS = {
     starter: {
         price_id: process.env.STRIPE_PRICE_STARTER || 'price_starter_placeholder', // R5500/mo
-        setup_fee: 1500000, // R15,000 in cents
         limits: { conversations: 500, users: 2, vehicles: 50 },
     },
     growth: {
         price_id: process.env.STRIPE_PRICE_GROWTH || 'price_growth_placeholder', // R12500/mo
-        setup_fee: 2500000, // R25,000 in cents
         limits: { conversations: 2500, users: 5, vehicles: 200 },
     },
     enterprise: {
         price_id: process.env.STRIPE_PRICE_ENTERPRISE || 'price_enterprise_placeholder', // R22000/mo
-        setup_fee: 4500000, // R45,000 in cents
         limits: { conversations: 10000, users: 20, vehicles: 1000 },
     }
 };
@@ -63,28 +60,18 @@ async function createCheckoutSession({ tenant, customerId, planKey, successUrl, 
         mode: 'subscription',
         success_url: successUrl,
         cancel_url: cancelUrl,
+        // Top-level metadata is accessible in the webhook event response
+        metadata: {
+            tenant_id: String(tenant.id),
+            plan: planKey,
+        },
         subscription_data: {
             metadata: {
-                tenant_id: tenant.id,
+                tenant_id: String(tenant.id),
                 plan: planKey,
             }
         }
     };
-
-    // Add one-time setup fee if they haven't paid it yet
-    if (!tenant.setup_fee_paid && plan.setup_fee > 0) {
-        sessionArgs.line_items.push({
-            price_data: {
-                currency: 'zar',
-                product_data: {
-                    name: `Setup Fee (${planKey.toUpperCase()})`,
-                    description: 'One-time onboarding and setup fee',
-                },
-                unit_amount: plan.setup_fee,
-            },
-            quantity: 1,
-        });
-    }
 
     return stripe.checkout.sessions.create(sessionArgs);
 }

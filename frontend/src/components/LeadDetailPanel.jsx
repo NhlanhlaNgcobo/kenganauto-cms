@@ -21,8 +21,6 @@ const STAGES = [
     { id: 'lost', label: 'Lost', color: '#EF4444' },
 ];
 
-function scoreColor(s) { return s >= 71 ? '#22C55E' : s >= 41 ? '#F97316' : '#EF4444'; }
-function scoreBg(s) { return s >= 71 ? 'rgba(34,197,94,0.12)' : s >= 41 ? 'rgba(249,115,22,0.12)' : 'rgba(239,68,68,0.12)'; }
 function timeAgo(iso) {
     if (!iso) return '—';
     const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
@@ -47,21 +45,22 @@ const ACT_ICONS = {
 };
 
 /* ── Section collapsible wrapper ── */
-const Section = ({ title, icon: Icon, defaultOpen = true, children, badge }) => {
+const Section = ({ title, icon, defaultOpen = true, children, badge }) => {
+    const IconComponent = icon;
     const [open, setOpen] = useState(defaultOpen);
     return (
         <div className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
             <button className="w-full flex items-center justify-between py-4 px-6 hover:bg-white/[0.02] transition-colors"
                 onClick={() => setOpen(p => !p)}>
                 <div className="flex items-center gap-2">
-                    <Icon size={14} style={{ color: 'rgba(201,168,76,0.6)' }} />
-                    <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.4)' }}>{title}</span>
+                    <IconComponent size={14} style={{ color: 'rgba(201,168,76,0.8)' }} />
+                    <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.62)' }}>{title}</span>
                     {badge !== undefined && badge !== null && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+                        <span className="px-1.5 py-0.5 rounded-full text-[12px] font-bold"
                             style={{ background: 'rgba(59,127,245,0.15)', color: '#60A5FA' }}>{badge}</span>
                     )}
                 </div>
-                {open ? <ChevronUp size={14} className="text-white/20" /> : <ChevronDown size={14} className="text-white/20" />}
+                {open ? <ChevronUp size={14} className="text-white/58" /> : <ChevronDown size={14} className="text-white/58" />}
             </button>
             {open && <div className="px-6 pb-5">{children}</div>}
         </div>
@@ -71,16 +70,13 @@ const Section = ({ title, icon: Icon, defaultOpen = true, children, badge }) => 
 /* ════════════════════════════════════════════════════════════
    LEAD DETAIL PANEL
    ════════════════════════════════════════════════════════════ */
-export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStageChange, onAddNote, onAssign, onAISummary }) {
+export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStageChange, onAddNote, onAssign, onAISummary: _onAISummary }) {
     const { lead, loading, error, refresh } = useLeadDetail(leadId);
 
     const [noteText, setNoteText] = useState('');
     const [addingNote, setAddingNote] = useState(false);
-    const [aiSummary, setAISummary] = useState(null);
-    const [gettingAI, setGettingAI] = useState(false);
     const [stageMenuOpen, setStageMenuOpen] = useState(false);
     const [assignMenuOpen, setAssignMenuOpen] = useState(false);
-    const [activeConvIdx, setActiveConvIdx] = useState(0);
 
     const panelRef = useRef(null);
 
@@ -100,16 +96,6 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
             refresh();
         } finally {
             setAddingNote(false);
-        }
-    };
-
-    const handleGetAISummary = async () => {
-        setGettingAI(true);
-        try {
-            const summary = await onAISummary(leadId);
-            setAISummary(summary);
-        } finally {
-            setGettingAI(false);
         }
     };
 
@@ -149,16 +135,16 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                 <div className="flex items-center justify-between px-6 py-5 flex-shrink-0"
                     style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-1" style={{ color: 'rgba(201,168,76,0.4)' }}>Lead #{lead?.id}</p>
                         <h2 className="font-outfit font-black text-xl text-white">
                             {loading ? '…' : lead?.customer_name}
+                            {lead?.id ? <span className="ml-2 font-sans text-sm font-medium text-white/58 tabular-nums">#{lead.id}</span> : null}
                         </h2>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={refresh} className="p-2.5 rounded-xl text-white/30 hover:text-white hover:bg-white/08 transition-all">
+                        <button onClick={refresh} className="p-2.5 rounded-xl text-white/58 hover:text-white hover:bg-white/08 transition-all">
                             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
                         </button>
-                        <button onClick={onClose} className="p-2.5 rounded-xl text-white/30 hover:text-white hover:bg-white/08 transition-all">
+                        <button onClick={onClose} className="p-2.5 rounded-xl text-white/58 hover:text-white hover:bg-white/08 transition-all">
                             <X size={18} />
                         </button>
                     </div>
@@ -199,7 +185,7 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm hover:bg-white/05 transition-all text-left">
                                                 <span className="w-2 h-2 rounded-full" style={{ background: s.color }} />
                                                 <span className="text-white/70">{s.label}</span>
-                                                {s.id === lead.status && <CheckCircle size={12} className="ml-auto text-white/30" />}
+                                                {s.id === lead.status && <CheckCircle size={12} className="ml-auto text-white/58" />}
                                             </button>
                                         ))}
                                     </div>
@@ -261,7 +247,7 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                     { label: 'Last Contact', value: timeAgo(lead.last_contact_at) },
                                 ].map(({ label, value, href }) => value && (
                                     <div key={label} className="flex items-center justify-between gap-4">
-                                        <span className="text-xs text-white/30 flex-shrink-0 w-28">{label}</span>
+                                        <span className="text-xs text-white/58 flex-shrink-0 w-28">{label}</span>
                                         {href ? (
                                             <a href={href} className="text-sm font-medium text-[#3B7FF5] hover:text-[#60A5FA] transition-colors truncate">{value}</a>
                                         ) : (
@@ -277,7 +263,7 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                             <div className="space-y-3">
                                 {lead.vehicle_interest && (
                                     <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <p className="text-xs text-white/30 mb-1">Vehicle Interest</p>
+                                        <p className="text-xs text-white/58 mb-1">Vehicle Interest</p>
                                         <p className="text-sm font-bold text-white">{lead.vehicle_interest}</p>
                                     </div>
                                 )}
@@ -285,13 +271,13 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                     <div className="flex gap-3">
                                         {lead.budget_min && (
                                             <div className="flex-1 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                                <p className="text-[10px] text-white/30 mb-0.5">Budget Min</p>
+                                                <p className="text-[12px] text-white/58 mb-0.5">Budget Min</p>
                                                 <p className="text-sm font-bold text-white">R {(lead.budget_min / 1000).toFixed(0)}k</p>
                                             </div>
                                         )}
                                         {lead.budget_max && (
                                             <div className="flex-1 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                                <p className="text-[10px] text-white/30 mb-0.5">Budget Max</p>
+                                                <p className="text-[12px] text-white/58 mb-0.5">Budget Max</p>
                                                 <p className="text-sm font-bold text-white">R {(lead.budget_max / 1000).toFixed(0)}k</p>
                                             </div>
                                         )}
@@ -314,12 +300,12 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                 {lead.conversations.map((conv, ci) => (
                                     <div key={ci} className="mb-4">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                            <span className="text-[12px] font-bold px-2 py-0.5 rounded-full"
                                                 style={{ background: 'rgba(59,127,245,0.12)', color: '#60A5FA' }}>
                                                 {conv.channel}
                                             </span>
                                             {conv.intent_detected && (
-                                                <span className="text-[10px] text-white/25">{conv.intent_detected}</span>
+                                                <span className="text-[12px] text-white/58">{conv.intent_detected}</span>
                                             )}
                                         </div>
                                         <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -378,7 +364,7 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                     <span className="text-white/70">
                                         {assignee ? `${assignee.first_name} ${assignee.last_name}` : 'Unassigned'}
                                     </span>
-                                    <ChevronDown size={14} className="ml-auto text-white/20" />
+                                    <ChevronDown size={14} className="ml-auto text-white/58" />
                                 </button>
                                 {assignMenuOpen && (
                                     <div className="absolute top-full left-0 right-0 mt-1 z-10 rounded-2xl p-1.5 shadow-xl"
@@ -386,13 +372,13 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                         {team.map(u => (
                                             <button key={u.id} onClick={() => handleAssign(u.id)}
                                                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/05 transition-all text-left">
-                                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black"
+                                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-black"
                                                     style={{ background: 'rgba(201,168,76,0.15)', color: '#C9A84C' }}>
                                                     {initials(`${u.first_name} ${u.last_name}`)}
                                                 </div>
                                                 <div>
                                                     <p className="text-sm text-white/80">{u.first_name} {u.last_name}</p>
-                                                    <p className="text-[10px] text-white/30">{u.role?.replace(/_/g, ' ')}</p>
+                                                    <p className="text-[12px] text-white/58">{u.role?.replace(/_/g, ' ')}</p>
                                                 </div>
                                                 {u.id === lead.assigned_to && <CheckCircle size={13} className="ml-auto text-[#C9A84C]" />}
                                             </button>
@@ -405,7 +391,7 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                         {/* ── Activity Timeline ── */}
                         <Section title="Activity Timeline" icon={Activity} badge={lead.activity_log?.length} defaultOpen={false}>
                             {!lead.activity_log?.length ? (
-                                <p className="text-xs text-white/25">No activity logged yet.</p>
+                                <p className="text-xs text-white/58">No activity logged yet.</p>
                             ) : (
                                 <div className="space-y-3">
                                     {[...(lead.activity_log || [])].reverse().map((act, i) => {
@@ -419,9 +405,9 @@ export default function LeadDetailPanel({ leadId, team, teamMap, onClose, onStag
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-xs text-white/70 leading-relaxed">{act.message}</p>
-                                                    {act.actor && <p className="text-[10px] text-white/25 mt-0.5">by {act.actor}</p>}
+                                                    {act.actor && <p className="text-[12px] text-white/58 mt-0.5">by {act.actor}</p>}
                                                 </div>
-                                                <span className="text-[10px] text-white/20 flex-shrink-0">
+                                                <span className="text-[12px] text-white/58 flex-shrink-0">
                                                     {timeAgo(act.timestamp)}
                                                 </span>
                                             </div>

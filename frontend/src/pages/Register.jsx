@@ -16,6 +16,7 @@ import {
     MapPin, Mail, Lock, Zap, Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Magnetic } from '../components/motion';
 
 /* ── Province list ── */
 const SA_PROVINCES = [
@@ -67,7 +68,7 @@ const steps = [
 /* ── Helper: field wrapper ── */
 const Field = ({ label, children }) => (
     <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.4)' }}>
+        <label className="text-[11px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.62)' }}>
             {label}
         </label>
         {children}
@@ -81,6 +82,7 @@ const Register = () => {
     const [showPass, setShowPass] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState(null);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     const { register } = useAuth();
     const navigate = useNavigate();
@@ -176,12 +178,12 @@ const Register = () => {
                                                         : '1px solid rgba(255,255,255,0.05)',
                                                 color: past ? '#4ADE80'
                                                     : active ? '#C9A84C'
-                                                        : 'rgba(240,237,232,0.15)',
+                                                        : 'rgba(240,237,232,0.55)',
                                             }}>
                                             {past ? <Check size={14} /> : <Icon size={14} />}
                                         </div>
-                                        <span className="text-[8px] font-black uppercase tracking-widest"
-                                            style={{ color: active ? '#C9A84C' : 'rgba(240,237,232,0.15)' }}>
+                                        <span className="text-[11px] font-black uppercase tracking-widest"
+                                            style={{ color: active ? '#C9A84C' : 'rgba(240,237,232,0.62)' }}>
                                             {s.label}
                                         </span>
                                     </div>
@@ -205,7 +207,7 @@ const Register = () => {
 
                     {/* Error */}
                     {error && (
-                        <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl mb-8 text-xs font-bold uppercase tracking-wider"
+                        <div className="flex items-center gap-3 px-5 py-3.5 rounded-[10px] mb-8 text-xs font-bold uppercase tracking-wider"
                             style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.15)', color: '#FCA5A5' }}>
                             <AlertCircle size={15} className="flex-shrink-0" />
                             {error}
@@ -216,14 +218,13 @@ const Register = () => {
                     {step === 1 && (
                         <div className="space-y-6">
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-1.5" style={{ color: 'rgba(201,168,76,0.5)' }}>Section 01 / 04</p>
-                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Dealership Core</h2>
-                                <p className="text-sm mt-2 opacity-40 leading-relaxed font-medium">Register your dealership group or single-branch outlet.</p>
+                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Dealership Core <span className="ml-2 align-middle font-sans text-sm font-semibold tracking-normal text-white/58">Step 1 of 4</span></h2>
+                                <p className="text-sm mt-2 opacity-70 leading-relaxed font-medium">Register your dealership group or single-branch outlet.</p>
                             </div>
                             <div className="grid grid-cols-1 gap-6 pt-2">
                                 <Field label="Dealership / Group Name">
                                     <div className="relative group">
-                                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.3)' }} />
+                                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                         <input type="text" className="lux-input pl-12" placeholder="Sunshine Motors"
                                             value={form.dealership_name} onChange={e => set('dealership_name', e.target.value)} />
                                     </div>
@@ -242,8 +243,8 @@ const Register = () => {
                                 </div>
                             </div>
                             {form.dealership_name && (
-                                <div className="px-5 py-4 rounded-2xl text-[10px] uppercase font-black tracking-widest flex items-center gap-3"
-                                    style={{ background: 'rgba(59,127,245,0.04)', border: '1px solid rgba(59,127,245,0.1)', color: 'rgba(240,237,232,0.4)' }}>
+                                <div className="px-5 py-4 rounded-[10px] text-[11px] uppercase font-black tracking-widest flex items-center gap-3"
+                                    style={{ background: 'rgba(59,127,245,0.04)', border: '1px solid rgba(59,127,245,0.1)', color: 'rgba(240,237,232,0.62)' }}>
                                     <Globe size={14} className="text-[#60A5FA]" />
                                     Portal Endpoint: <span className="text-[#60A5FA]">
                                         {form.dealership_name.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').substring(0, 30)}.kenganauto.co.za
@@ -257,9 +258,8 @@ const Register = () => {
                     {step === 2 && (
                         <div className="space-y-6">
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-1.5" style={{ color: 'rgba(201,168,76,0.5)' }}>Section 02 / 04</p>
-                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Security & Admin</h2>
-                                <p className="text-sm mt-2 opacity-40 leading-relaxed font-medium">Create your primary administrator credentials.</p>
+                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Security & Admin <span className="ml-2 align-middle font-sans text-sm font-semibold tracking-normal text-white/58">Step 2 of 4</span></h2>
+                                <p className="text-sm mt-2 opacity-70 leading-relaxed font-medium">Create your primary administrator credentials.</p>
                             </div>
                             <div className="grid grid-cols-2 gap-6 pt-2">
                                 <Field label="First Name">
@@ -273,18 +273,18 @@ const Register = () => {
                             </div>
                             <Field label="Work Email Address">
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.3)' }} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                     <input type="email" className="lux-input pl-12" placeholder="admin@dealership.co.za"
                                         value={form.admin_email} onChange={e => set('admin_email', e.target.value)} />
                                 </div>
                             </Field>
                             <Field label="System Password">
                                 <div className="relative group">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.3)' }} />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                     <input type={showPass ? 'text' : 'password'} className="lux-input pl-12 pr-12" placeholder="••••••••••••"
                                         value={form.admin_password} onChange={e => set('admin_password', e.target.value)} />
                                     <button type="button" onClick={() => setShowPass(p => !p)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.2)' }}>
+                                        className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                         {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
@@ -305,18 +305,17 @@ const Register = () => {
                     {step === 3 && (
                         <div className="space-y-6">
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-1.5" style={{ color: 'rgba(201,168,76,0.5)' }}>Section 03 / 04</p>
-                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">AI Messaging</h2>
-                                <p className="text-sm mt-2 opacity-40 leading-relaxed font-medium">Connect your WhatsApp Business number for automation.</p>
+                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">AI Messaging <span className="ml-2 align-middle font-sans text-sm font-semibold tracking-normal text-white/58">Step 3 of 4</span></h2>
+                                <p className="text-sm mt-2 opacity-70 leading-relaxed font-medium">Connect your WhatsApp Business number for automation.</p>
                             </div>
                             <Field label="WhatsApp Primary Number">
                                 <div className="relative group pt-2">
-                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.3)' }} />
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#C9A84C] transition-colors" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                     <input type="tel" className="lux-input pl-12" placeholder="+27 82 555 1234"
                                         value={form.whatsapp_number} onChange={e => set('whatsapp_number', e.target.value)} />
                                 </div>
                             </Field>
-                            <div className="bg-[#10B981]/5 border border-[#10B981]/15 rounded-2xl p-6 space-y-4">
+                            <div className="bg-[#10B981]/5 border border-[#10B981]/15 rounded-[10px] p-6 space-y-4">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-[#10B981]/10 rounded-xl">
                                         <Zap size={16} className="text-[#10B981]" />
@@ -343,15 +342,14 @@ const Register = () => {
                     {step === 4 && (
                         <div className="space-y-8">
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-1.5" style={{ color: 'rgba(201,168,76,0.5)' }}>Section 04 / 04</p>
-                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Select Framework</h2>
-                                <p className="text-sm mt-2 opacity-40 leading-relaxed font-medium">Enterprise intelligence scaled to your branch volume.</p>
+                                <h2 className="font-outfit font-black text-3xl text-white tracking-tight">Select Framework <span className="ml-2 align-middle font-sans text-sm font-semibold tracking-normal text-white/58">Step 4 of 4</span></h2>
+                                <p className="text-sm mt-2 opacity-70 leading-relaxed font-medium">Enterprise intelligence scaled to your branch volume.</p>
                             </div>
                             <div className="grid grid-cols-1 gap-4 pt-2">
                                 {PLANS.map(plan => (
                                     <button key={plan.key}
                                         onClick={() => set('plan', plan.key)}
-                                        className="w-full text-left rounded-3xl transition-all relative overflow-hidden group/plan"
+                                        className="w-full text-left rounded-[10px] transition-all relative overflow-hidden group/plan"
                                         style={{
                                             background: form.plan === plan.key ? 'rgba(201,168,76,0.06)' : 'rgba(255,255,255,0.02)',
                                             border: `1px solid ${form.plan === plan.key ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.06)'}`,
@@ -363,23 +361,23 @@ const Register = () => {
                                                 <div className="flex items-center gap-3">
                                                     <h3 className="font-outfit font-black text-xl text-white tracking-wide uppercase">{plan.label}</h3>
                                                     {plan.popular && (
-                                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-lg"
+                                                        <span className="text-[11px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-lg"
                                                             style={{ background: '#C9A84C', color: '#000' }}>
                                                             Bestseller
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-[10px] uppercase font-bold tracking-widest opacity-30">{plan.desc}</p>
+                                                <p className="text-[11px] uppercase font-bold tracking-widest opacity-70">{plan.desc}</p>
                                             </div>
                                             <div className="text-right">
                                                 <div className="font-outfit font-black text-xl tracking-tight" style={{ color: plan.color }}>{plan.price}</div>
-                                                <div className="text-[8px] font-black uppercase tracking-widest opacity-20">Per Month</div>
+                                                <div className="text-[11px] font-black uppercase tracking-widest opacity-70">Per Month</div>
                                             </div>
                                         </div>
 
                                         <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 pt-4 border-t border-white/5">
                                             {plan.features.slice(0, 4).map((f, i) => (
-                                                <span key={i} className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: plan.color }}>
+                                                <span key={i} className="text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: plan.color }}>
                                                     <Check size={10} /> {f}
                                                 </span>
                                             ))}
@@ -393,17 +391,32 @@ const Register = () => {
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Terms Agreement */}
+                            <div className="pt-6 border-t border-white/5 space-y-4">
+                                <label className="flex items-start gap-3 cursor-pointer group">
+                                    <div className="relative mt-0.5">
+                                        <input type="checkbox" className="sr-only" checked={agreedToTerms} onChange={e => setAgreedToTerms(e.target.checked)} />
+                                        <div className={`h-5 w-5 rounded border transition-all flex items-center justify-center ${agreedToTerms ? 'bg-[#C9A84C] border-[#C9A84C]' : 'bg-white/5 border-white/10 group-hover:border-[#C9A84C]/50'}`}>
+                                            {agreedToTerms && <Check size={14} className="text-[#0A0F1E] font-black" />}
+                                        </div>
+                                    </div>
+                                    <span className="text-[12px] leading-relaxed opacity-70 group-hover:opacity-60 transition-opacity font-medium">
+                                        I have read and agree to the <Link to="/legal/terms" target="_blank" className="text-[#C9A84C] underline hover:text-[#C9A84C] transition-colors font-black">Terms & Conditions</Link>, <Link to="/legal/privacy" target="_blank" className="text-[#C9A84C] underline hover:text-[#C9A84C] transition-colors font-black">Privacy Policy</Link>, and <Link to="/legal/popia" target="_blank" className="text-[#C9A84C] underline hover:text-[#C9A84C] transition-colors font-black">POPIA Compliance Notice</Link>.
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     )}
 
                     {/* ─── STEP 5 — Confirmation ─── */}
                     {step === 5 && (
                         <div className="text-center space-y-10 py-4">
-                            <div className="h-24 w-24 mx-auto rounded-full flex items-center justify-center relative shadow-[0_0_60px_rgba(16,185,129,0.15)]"
+                            <div className="h-24 w-24 mx-auto rounded-full flex items-center justify-center relative"
                                 style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)' }}>
                                 <CheckCircle2 size={42} className="text-[#10B981]" />
                                 <div className="absolute inset-x-0 -bottom-3 flex justify-center">
-                                    <div className="bg-[#10B981] text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full text-black">
+                                    <div className="bg-[#10B981] text-[11px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full text-black">
                                         Active
                                     </div>
                                 </div>
@@ -411,20 +424,20 @@ const Register = () => {
 
                             <div className="space-y-3">
                                 <h2 className="font-outfit font-black text-4xl text-white tracking-tight">Ecosystem Live.</h2>
-                                <p className="text-sm opacity-40 font-medium max-w-sm mx-auto leading-relaxed">Your dealership OS is provisioned and ready for deployment. Log in below.</p>
+                                <p className="text-sm opacity-70 font-medium max-w-sm mx-auto leading-relaxed">Your dealership OS is provisioned and ready for deployment. Log in below.</p>
                             </div>
 
                             <div className="rounded-[2rem] p-8 text-left space-y-8"
                                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(251,191,36,0.1)' }}>
                                 <div className="space-y-1.5">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Deployment URL</p>
+                                    <p className="text-[11px] font-black uppercase tracking-[0.4em] opacity-70">Deployment URL</p>
                                     <p className="font-outfit font-black text-xl text-[#C9A84C] tracking-wide">
                                         {result?.portal_url || `https://${form.dealership_name.toLowerCase().replace(/\s+/g, '-')}.kenganauto.co.za`}
                                     </p>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Provisioning Checklist</p>
+                                    <p className="text-[11px] font-black uppercase tracking-[0.4em] opacity-70">Provisioning Checklist</p>
                                     {[
                                         ['Core Instance Created', true],
                                         ['Admin VPC Account Linked', true],
@@ -444,11 +457,11 @@ const Register = () => {
 
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="w-full py-5 font-outfit font-black text-sm tracking-[0.3em] uppercase flex items-center justify-center gap-3 rounded-2xl group/btn"
+                                className="w-full py-5 font-outfit font-black text-sm tracking-[0.3em] uppercase flex items-center justify-center gap-3 rounded-[10px] group/btn"
                                 style={{
                                     background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
                                     color: '#0A0F1E',
-                                    boxShadow: '0 20px 40px rgba(201,168,76,0.2)',
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
                                 }}>
                                 Launch Dashboard <ArrowRight size={18} className="group-hover/btn:translate-x-1.5 transition-transform" />
                             </button>
@@ -460,29 +473,31 @@ const Register = () => {
                         <div className="flex flex-col md:flex-row gap-4 mt-12">
                             {step > 1 && (
                                 <button onClick={back}
-                                    className="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center"
+                                    className="px-8 py-4 rounded-[10px] font-black text-[11px] uppercase tracking-[0.3em] transition-all flex items-center justify-center"
                                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'white' }}>
                                     Back
                                 </button>
                             )}
-                            <button
-                                onClick={step === 4 ? submit : next}
-                                disabled={isLoading}
-                                className="flex-1 py-4.5 rounded-2xl font-outfit font-black text-xs tracking-[0.4em] uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl h-14"
-                                style={{
-                                    background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
-                                    color: '#0A0F1E',
-                                }}>
-                                {isLoading ? 'Deploying Core…' : step === 4 ? 'Create My Dealership' : 'Continue'}
-                                {!isLoading && <ArrowRight size={18} />}
-                            </button>
+                            <Magnetic strength={0.22} className="flex-1">
+                                <button
+                                    onClick={step === 4 ? submit : next}
+                                    disabled={isLoading || (step === 4 && !agreedToTerms)}
+                                    className="w-full py-4.5 rounded-[10px] font-outfit font-black text-xs tracking-[0.4em] uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl h-14"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
+                                        color: '#0A0F1E',
+                                    }}>
+                                    {isLoading ? 'Deploying Core…' : step === 4 ? 'Create My Dealership' : 'Continue'}
+                                    {!isLoading && <ArrowRight size={18} />}
+                                </button>
+                            </Magnetic>
                         </div>
                     )}
                 </div>
 
                 <div className="text-center mt-10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-20 mb-3">KenganAuto OS v1.2</p>
-                    <Link to="/login" className="text-[11px] font-bold text-[#C9A84C]/60 hover:text-[#C9A84C] transition-colors uppercase tracking-[0.2em]">
+                    <p className="text-[11px] font-black uppercase tracking-[0.4em] opacity-70 mb-3">KenganAuto OS v1.2</p>
+                    <Link to="/login" className="text-[11px] font-bold text-[#C9A84C]/80 hover:text-[#C9A84C] transition-colors uppercase tracking-[0.2em]">
                         Already registered? <span className="underline underline-offset-4">Sign in</span>
                     </Link>
                 </div>

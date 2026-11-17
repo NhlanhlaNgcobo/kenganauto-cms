@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Magnetic } from '../components/motion';
 
 const ResetPassword = () => {
     const [password, setPassword] = useState('');
@@ -63,11 +64,11 @@ const ResetPassword = () => {
                     {!done ? (
                         <>
                             <div className="mb-8">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: 'rgba(201,168,76,0.5)' }}>
+                                <p className="text-[11px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: 'rgba(201,168,76,0.8)' }}>
                                     Reset Password
                                 </p>
                                 <h2 className="font-outfit font-black text-2xl text-white">Set new password</h2>
-                                <p className="text-sm mt-2" style={{ color: 'rgba(240,237,232,0.4)' }}>Must be at least 8 characters.</p>
+                                <p className="text-sm mt-4" style={{ color: 'rgba(240,237,232,0.62)' }}>Must be at least 8 characters.</p>
                             </div>
 
                             {error && (
@@ -79,30 +80,32 @@ const ResetPassword = () => {
 
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.4)' }}>New Password</label>
+                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.62)' }}>New Password</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.4)' }} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                         <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
                                             placeholder="Min 8 characters" className="lux-input pl-11 pr-12" />
                                         <button type="button" onClick={() => setShowPass(p => !p)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                                            className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                             {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.4)' }}>Confirm Password</label>
+                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.62)' }}>Confirm Password</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.4)' }} />
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                         <input type={showPass ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)}
                                             placeholder="Repeat password" className="lux-input pl-11" />
                                     </div>
                                 </div>
-                                <button type="submit" disabled={isLoading}
-                                    className="w-full py-4 font-outfit font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-60"
-                                    style={{ background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)', color: '#0A0F1E', boxShadow: '0 8px 32px rgba(201,168,76,0.25)' }}>
-                                    {isLoading ? 'Updating…' : (<>Update Password <ArrowRight size={17} /></>)}
-                                </button>
+                                <Magnetic strength={0.25} className="w-full">
+                                    <button type="submit" disabled={isLoading}
+                                        className="w-full py-4 font-outfit font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-60"
+                                        style={{ background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)', color: '#0A0F1E', boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)' }}>
+                                        {isLoading ? 'Updating…' : (<>Update Password <ArrowRight size={17} /></>)}
+                                    </button>
+                                </Magnetic>
                             </form>
                         </>
                     ) : (
@@ -113,7 +116,7 @@ const ResetPassword = () => {
                             </div>
                             <div>
                                 <h2 className="font-outfit font-black text-2xl text-white mb-2">Password updated!</h2>
-                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.4)' }}>You can now sign in with your new password.</p>
+                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.62)' }}>You can now sign in with your new password.</p>
                             </div>
                             <button onClick={() => navigate('/login')}
                                 className="w-full py-4 font-outfit font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 rounded-2xl"

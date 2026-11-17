@@ -186,7 +186,7 @@ router.patch('/enquiries/:id', authenticate, async (req, res) => {
     // WhatsApp Notification triggers
     if (updated.status === 'ready' && updated.customer_phone && !updated.customer_name.startsWith('INTERNAL')) {
         const msg = `Good news! Your ${updated.part_name} for your ${updated.vehicle_make} ${updated.vehicle_model} is ready for collection. Total due: R${updated.price_quoted || '0.00'}. We're open Mon-Fri 8am-5pm.`;
-        whatsappSvc.sendText(tenantId, updated.customer_phone, msg).catch(console.error);
+        Promise.resolve().then(() => whatsappSvc.sendText(tenantId, updated.customer_phone, msg)).catch(console.error);
     } else if (updated.status === 'ready' && updated.customer_name.startsWith('INTERNAL')) {
         // Technically: we'd fire an internal notification to the Service Advisor who owns that JC 
         // e.g., Update Job Card status to 'Parts Ready' implicitly if we hooked them tight in a CRM logic block.

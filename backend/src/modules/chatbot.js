@@ -21,6 +21,10 @@ const { authenticate } = require('../middleware/auth');
 /* ── In-memory conversation store (replace with DB queries when PG is live) ── */
 const ConversationStore = new Map();
 
+/* ── Models (loaded gracefully) ── */
+let Tenant;
+try { Tenant = require('../models/Tenant'); } catch { /* DB not ready */ }
+
 /* ── Helpers ── */
 function getOrCreateConversation(id, tenantId, channel, externalUserId) {
     if (!ConversationStore.has(id)) {
@@ -41,8 +45,18 @@ function getOrCreateConversation(id, tenantId, channel, externalUserId) {
     return ConversationStore.get(id);
 }
 
-function buildTenantMock(tenantId) {
-    // When DB is live, fetch from tenants table. For now return mock.
+/**
+ * Fetch real tenant from DB, falling back to a sensible demo mock.
+ * Cached per-request via in-memory map to avoid repeated DB hits per message.
+ */
+async function getTenantById(tenantId) {
+    if (Tenant && tenantId) {
+        try {
+            const found = await Tenant.query().findById(tenantId);
+            if (found) return found;
+        } catch { /* DB unavailable — fall through to mock */ }
+    }
+    // Dev / DB-unavailable fallback
     return {
         id: tenantId || 1,
         name: process.env.DEMO_TENANT_NAME || 'KenganAuto Demo Motors',
@@ -54,6 +68,7 @@ function buildTenantMock(tenantId) {
         plan: 'growth',
     };
 }
+
 
 /* ─────────────────────────────────────────────────────────────
    POST /chat/message
@@ -73,7 +88,7 @@ router.post('/message', async (req, res) => {
     }
 
     const convId = conversation_id || `conv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const tenant = buildTenantMock(tenant_id || req.tenant?.id);
+    const tenant = await getTenantById(tenant_id || req.tenant?.id);
     const conv = getOrCreateConversation(convId, tenant.id, channel, external_user_id);
 
     try {

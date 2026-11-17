@@ -1,0 +1,15 @@
+{
+  "name": "acme-cars-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Acme Cars — demo dealership website connected live to KenganAuto",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.0.1"
+  }
+}

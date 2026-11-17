@@ -36,23 +36,23 @@ const FinancePage = () => {
                             <span className="text-white">Finance</span>
                             <span className="ml-2 gold-text">Console</span>
                         </h1>
-                        <p className="text-[9px] tracking-[0.25em] uppercase mt-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>
+                        <p className="text-[11px] tracking-[0.25em] uppercase mt-0.5" style={{ color: 'rgba(201,168,76,0.8)' }}>
                             Credit · Banking · Compliance
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold"
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold"
                         style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', color: '#4ADE80' }}>
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 6px rgba(74,222,128,0.8)' }} />
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: 'none' }} />
                         POPIA Compliant
                     </div>
                     <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-wider transition-all"
                         style={{
                             background: 'linear-gradient(135deg,#C9A84C,#9A7830)',
                             color: '#0A0F1E',
-                            boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 28px rgba(201,168,76,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                         onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,168,76,0.25)'; e.currentTarget.style.transform = 'none'; }}>
@@ -73,13 +73,13 @@ const FinancePage = () => {
                         <div className="luxury-card p-7">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
+                                    <p className="text-[11px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.8)' }}>
                                         Workflow
                                     </p>
-                                    <h3 className="font-outfit font-bold text-lg text-white">Pipeline Status</h3>
+                                    <h2 className="font-outfit font-bold text-lg text-white">Pipeline Status</h2>
                                 </div>
                                 <button className="text-[11px] font-bold uppercase tracking-wider transition-colors"
-                                    style={{ color: 'rgba(201,168,76,0.5)' }}
+                                    style={{ color: 'rgba(201,168,76,0.8)' }}
                                     onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
                                     onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
                                     View Queue
@@ -101,11 +101,11 @@ const FinancePage = () => {
                                             <span className="font-semibold text-sm text-white">{step.title}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
+                                            <span className="text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
                                                 style={{ background: step.bg, color: step.color }}>
                                                 {step.status}
                                             </span>
-                                            <ChevronRight size={13} style={{ color: 'rgba(240,237,232,0.2)' }} className="group-hover:translate-x-0.5 transition-transform" />
+                                            <ChevronRight size={13} style={{ color: 'rgba(240,237,232,0.62)' }} className="group-hover:translate-x-0.5 transition-transform" />
                                         </div>
                                     </div>
                                 ))}
@@ -114,7 +114,7 @@ const FinancePage = () => {
                     </div>
 
                     {/* Right: Banks + POPIA */}
-                    <div className="space-y-8">
+                    <div className="space-y-8 xl:sticky xl:top-6 xl:self-start">
 
                         {/* Bank Connectivity Hub */}
                         <div className="luxury-card p-8 relative overflow-hidden">
@@ -122,18 +122,15 @@ const FinancePage = () => {
                                 <Landmark size={220} style={{ color: '#C9A84C' }} />
                             </div>
                             <div className="relative z-10">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                    Integrations
-                                </p>
-                                <h3 className="font-outfit font-black text-2xl text-white mb-1">Bank Connectivity Hub</h3>
-                                <p className="text-[11px] mb-8" style={{ color: 'rgba(240,237,232,0.35)' }}>
+                                <h2 className="font-outfit font-black text-2xl text-white mb-1">Bank Connectivity Hub</h2>
+                                <p className="text-[12px] mb-8" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     Secure transmission via KenganAuto Gateway
                                 </p>
                                 <div className="grid grid-cols-3 gap-3">
                                     {banks.map((bank, i) => (
                                         <button key={i}
                                             className="py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest text-center transition-all"
-                                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(240,237,232,0.5)' }}
+                                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(240,237,232,0.62)' }}
                                             onMouseEnter={e => {
                                                 e.currentTarget.style.background = 'rgba(201,168,76,0.08)';
                                                 e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)';
@@ -174,15 +171,15 @@ const FinancePage = () => {
                                         <PhoneCall size={20} style={{ color: '#C9A84C' }} />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">POPIA Privacy Guardian</h3>
-                                        <p className="text-[10px] uppercase tracking-widest mt-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>v2.4 Active</p>
+                                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white">POPIA Privacy Guardian</h2>
+                                        <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'rgba(201,168,76,0.8)' }}>v2.4 Active</p>
                                     </div>
                                 </div>
-                                <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(240,237,232,0.45)', maxWidth: '36ch' }}>
+                                <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(240,237,232,0.62)', maxWidth: '36ch' }}>
                                     Automated data purging for unsuccessful credit applications. Full audit trail for data access mandated by the Information Regulator of South Africa.
                                 </p>
                                 <button className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest transition-all"
-                                    style={{ color: 'rgba(201,168,76,0.6)' }}
+                                    style={{ color: 'rgba(201,168,76,0.8)' }}
                                     onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.transform = 'translateX(4px)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.6)'; e.currentTarget.style.transform = 'none'; }}>
                                     View Compliance Logs <ArrowUpRight size={16} />
@@ -197,14 +194,14 @@ const FinancePage = () => {
                                 SD
                             </div>
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(201,168,76,0.4)' }}>
+                                <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(201,168,76,0.8)' }}>
                                     Lead NPS Feedback
                                 </p>
                                 <p className="font-outfit font-bold text-base text-white">"Excellent service from Siyanda."</p>
                             </div>
                             <div className="ml-auto flex">
                                 {[1, 2, 3, 4, 5].map(s => (
-                                    <span key={s} className="text-base" style={{ color: s <= 5 ? '#C9A84C' : 'rgba(255,255,255,0.1)' }}>★</span>
+                                    <span key={s} className="text-base" style={{ color: s <= 5 ? '#C9A84C' : 'rgba(255,255,255,0.66)' }}>★</span>
                                 ))}
                             </div>
                         </div>

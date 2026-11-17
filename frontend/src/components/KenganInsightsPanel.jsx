@@ -29,7 +29,7 @@ const TIMELINE_COLORS = {
     'Immediate (this week)': { color: '#DC2626', bg: 'rgba(220,38,38,0.12)' },
     'Short-term (1 month)': { color: '#EA580C', bg: 'rgba(234,88,12,0.12)' },
     'Medium-term (1-3 months)': { color: '#D97706', bg: 'rgba(217,119,6,0.12)' },
-    'Long-term (3+ months)': { color: '#3B7FF5', bg: 'rgba(59,127,245,0.12)' },
+    'Long-term (3+ months)': { color: '#60A5FA', bg: 'rgba(59,127,245,0.12)' },
     'Unknown': { color: '#6B7280', bg: 'rgba(107,114,128,0.12)' },
 };
 
@@ -58,7 +58,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
         try {
             const res = await axios.get(`${API_BASE}/api/leads/${lead.id}/score`, { headers: authHeaders() });
             setScoreData(res.data);
-        } catch (err) {
+        } catch {
             setError('Could not load score data.');
         } finally {
             setLoading(false);
@@ -78,7 +78,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                 setRescoring(false);
                 onRescoreComplete?.();
             }, 3500);
-        } catch (err) {
+        } catch {
             setError('Rescore failed. Check your API key.');
             setRescoring(false);
         }
@@ -107,7 +107,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                         <Zap size={14} style={{ color: currentTier.color }} />
                     </div>
                     <div className="text-left">
-                        <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.3)' }}>Kengan AI Scoring</p>
+                        <p className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'rgba(240,237,232,0.62)' }}>Kengan AI Scoring</p>
                         <p className="text-sm font-bold text-white leading-tight">
                             {currentTier.emoji} {currentTier.label} Lead
                         </p>
@@ -117,7 +117,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                 <div className="flex items-center gap-3">
                     {/* Score ring */}
                     <AIScoreBadge score={currentScore} size="md" ring animated />
-                    {expanded ? <ChevronUp size={14} className="text-white/20" /> : <ChevronDown size={14} className="text-white/20" />}
+                    {expanded ? <ChevronUp size={14} className="text-white/58" /> : <ChevronDown size={14} className="text-white/58" />}
                 </div>
             </button>
 
@@ -137,7 +137,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                         style={{ background: `${currentTier.color}10`, border: `1px solid ${currentTier.color}20` }}>
                         <Flame size={14} className="flex-shrink-0 mt-0.5" style={{ color: currentTier.color }} />
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest mb-0.5 opacity-60" style={{ color: currentTier.color }}>Recommended Action</p>
+                            <p className="text-[11px] font-black uppercase tracking-widest mb-0.5 opacity-60" style={{ color: currentTier.color }}>Recommended Action</p>
                             <p className="text-sm font-bold" style={{ color: currentTier.color }}>{currentTier.action}</p>
                         </div>
                     </div>
@@ -158,8 +158,8 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                                 {/* Seriousness */}
                                 <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                     <div className="flex items-center gap-1.5 mb-2">
-                                        <Target size={11} className="text-white/35" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Seriousness</p>
+                                        <Target size={11} className="text-white/58" />
+                                        <p className="text-[11px] font-black uppercase tracking-widest text-white/58">Seriousness</p>
                                     </div>
                                     <SeriousnessMeter value={insights.seriousness || 5} />
                                 </div>
@@ -167,10 +167,10 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                                 {/* Timeline */}
                                 <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                     <div className="flex items-center gap-1.5 mb-2">
-                                        <Clock size={11} className="text-white/35" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Timeline</p>
+                                        <Clock size={11} className="text-white/58" />
+                                        <p className="text-[11px] font-black uppercase tracking-widest text-white/58">Timeline</p>
                                     </div>
-                                    <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black"
+                                    <span className="inline-flex px-2 py-0.5 rounded-full text-[12px] font-black"
                                         style={{ background: tlStyle.bg, color: tlStyle.color }}>
                                         {insights.timeline || 'Unknown'}
                                     </span>
@@ -181,9 +181,9 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                             {insights.recommended_vehicle && (
                                 <div className="flex items-center gap-3 p-3 rounded-xl"
                                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                    <Car size={14} className="text-white/35 flex-shrink-0" />
+                                    <Car size={14} className="text-white/58 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">Best Match Vehicle</p>
+                                        <p className="text-[11px] font-black uppercase tracking-widest text-white/58 mb-0.5">Best Match Vehicle</p>
                                         <p className="text-sm font-bold text-white truncate">{insights.recommended_vehicle}</p>
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                                     style={{ background: 'rgba(59,127,245,0.08)', border: '1px solid rgba(59,127,245,0.15)' }}>
                                     <ArrowRight size={14} className="text-[#3B7FF5] flex-shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[#3B7FF5]/50 mb-0.5">Next Action</p>
+                                        <p className="text-[11px] font-black uppercase tracking-widest text-[#3B7FF5]/50 mb-0.5">Next Action</p>
                                         <p className="text-[13px] text-[#60A5FA] leading-relaxed">{insights.next_action}</p>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
 
                             {/* AI-powered badge */}
                             {insights.ai_powered && (
-                                <div className="flex items-center gap-1.5 text-[10px] text-white/20">
+                                <div className="flex items-center gap-1.5 text-[12px] text-white/58">
                                     <Zap size={10} />
                                     Analysis by Claude claude-sonnet-4-5 · {insights.scored_at ? new Date(insights.scored_at).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                                 </div>
@@ -211,7 +211,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                         </div>
                     ) : (
                         <div className="text-center py-4">
-                            <p className="text-xs text-white/30 mb-3">
+                            <p className="text-xs text-white/58 mb-3">
                                 {loading ? 'Loading AI analysis…' : 'No Claude analysis yet for this lead.'}
                             </p>
                             {!loading && (
@@ -232,7 +232,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                                     if (!scoreData) await loadScore();
                                     setBreakdownOpen(p => !p);
                                 }}
-                                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors w-full"
+                                className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-white/58 hover:text-white/58 transition-colors w-full"
                             >
                                 <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
                                 <span className="flex-shrink-0 flex items-center gap-1.5">
@@ -269,7 +269,7 @@ export default function KenganInsightsPanel({ lead, onRescoreComplete }) {
                     </button>
 
                     {rescoring && (
-                        <p className="text-center text-[10px] text-white/20">
+                        <p className="text-center text-[12px] text-white/58">
                             Analysis usually takes 3–5 seconds. Score will update automatically.
                         </p>
                     )}

@@ -24,9 +24,9 @@ export function getTier(score) {
 }
 
 const SIZE_CONFIGS = {
-    xs: { ring: 'w-8 h-8 text-[10px]', label: 'hidden', icon: 10, padding: 'p-0', gap: 'gap-1' },
-    sm: { ring: 'w-9 h-9 text-xs', label: 'text-[9px]', icon: 12, padding: 'px-2 py-1 rounded-lg', gap: 'gap-1.5' },
-    md: { ring: 'w-11 h-11 text-sm', label: 'text-[11px]', icon: 14, padding: 'px-3 py-1.5 rounded-xl', gap: 'gap-2' },
+    xs: { ring: 'w-8 h-8 text-[12px]', label: 'hidden', icon: 10, padding: 'p-0', gap: 'gap-1' },
+    sm: { ring: 'w-9 h-9 text-xs', label: 'text-[12px]', icon: 12, padding: 'px-2 py-1 rounded-lg', gap: 'gap-1.5' },
+    md: { ring: 'w-11 h-11 text-sm', label: 'text-[12px]', icon: 14, padding: 'px-3 py-1.5 rounded-xl', gap: 'gap-2' },
     lg: { ring: 'w-14 h-14 text-base', label: 'text-xs', icon: 16, padding: 'px-4 py-2 rounded-xl', gap: 'gap-2.5' },
 };
 
@@ -126,7 +126,7 @@ export default function AIScoreBadge({
 }
 
 /* ── Score Breakdown panel ── */
-export function ScoreBreakdown({ breakdown = [], signals = {}, insights = null, loading = false }) {
+export function ScoreBreakdown({ breakdown = [], signals: _signals = {}, insights = null, loading = false }) {
     if (loading) {
         return (
             <div className="space-y-2">
@@ -146,13 +146,13 @@ export function ScoreBreakdown({ breakdown = [], signals = {}, insights = null, 
             {/* Score ring summary */}
             {positives.length > 0 && (
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Positive Signals</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white/58 mb-2">Positive Signals</p>
                     <div className="space-y-1.5">
                         {positives.map((b, i) => (
                             <div key={i} className="flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
                                     <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#22C55E' }} />
-                                    <span className="text-xs text-white/50 truncate">{b.label}</span>
+                                    <span className="text-xs text-white/58 truncate">{b.label}</span>
                                 </div>
                                 <span className="text-xs font-black flex-shrink-0" style={{ color: '#22C55E' }}>+{b.points}</span>
                             </div>
@@ -163,13 +163,13 @@ export function ScoreBreakdown({ breakdown = [], signals = {}, insights = null, 
 
             {negatives.length > 0 && (
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Negative Signals</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white/58 mb-2">Negative Signals</p>
                     <div className="space-y-1.5">
                         {negatives.map((b, i) => (
                             <div key={i} className="flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
                                     <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#EF4444' }} />
-                                    <span className="text-xs text-white/50 truncate">{b.label}</span>
+                                    <span className="text-xs text-white/58 truncate">{b.label}</span>
                                 </div>
                                 <span className="text-xs font-black flex-shrink-0" style={{ color: '#EF4444' }}>{b.points}</span>
                             </div>
@@ -180,14 +180,14 @@ export function ScoreBreakdown({ breakdown = [], signals = {}, insights = null, 
 
             {/* Total */}
             <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="text-xs font-black uppercase tracking-widest text-white/30">Rule Score</span>
+                <span className="text-xs font-black uppercase tracking-widest text-white/58">Rule Score</span>
                 <span className="text-sm font-black text-white">{Math.min(100, Math.max(0, total))}/100</span>
             </div>
 
             {/* Claude adjustment note */}
             {insights?.score_adjustment !== undefined && insights.score_adjustment !== 0 && (
                 <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/25">Kengan AI Adjustment</span>
+                    <span className="text-xs text-white/58">Kengan AI Adjustment</span>
                     <span className="text-xs font-bold" style={{ color: insights.score_adjustment > 0 ? '#22C55E' : '#EF4444' }}>
                         {insights.score_adjustment > 0 ? '+' : ''}{insights.score_adjustment}
                     </span>

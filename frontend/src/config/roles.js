@@ -5,16 +5,17 @@
 
 export const ROLE_NAV = {
     admin: [
-        'dashboard', 'leads', 'chatbot', 'finance', 'trade-in', 'stock', 'service', 'parts', 'retention', 'support', 'whatsapp', 'widget'
+        'dashboard', 'followups', 'leads', 'chatbot', 'finance', 'trade-in', 'stock', 'service', 'parts', 'retention', 'support', 'whatsapp', 'widget',
+        'targets', 'customer-care', 'customers', 'ai-impact', 'online-deals'
     ],
     salesperson: [
-        'dashboard', 'leads', 'stock', 'customers'
+        'dashboard', 'followups', 'leads', 'online-deals', 'stock', 'customers', 'targets'
     ],
     finance_manager: [
-        'dashboard', 'finance'
+        'dashboard', 'finance', 'online-deals'
     ],
     service_advisor: [
-        'dashboard', 'service', 'customers', 'stock'
+        'dashboard', 'service', 'customers', 'stock', 'customer-care', 'targets'
     ],
     parts_manager: [
         'dashboard', 'parts'

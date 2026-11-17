@@ -11,10 +11,40 @@ const router = express.Router();
 const pino = require('pino');
 const logger = pino({ name: 'integrations' });
 
-// We'll simulate requiring `auth` for settings, but webhooks remain unauthenticated or use tenant_id tokens.
 const { authenticate } = require('../middleware/auth');
 const notificationService = require('../services/notification_service');
-const whatsappService = require('../services/whatsapp_service'); // to trigger chatbot explicitly
+const whatsappService = require('../services/whatsapp_service');
+
+// Load Lead model gracefully
+let Lead;
+try { Lead = require('../models/Lead'); } catch { /* DB not ready */ }
+
+/** Try DB insert with mock fallback */
+async function insertLead({ tenant_id, customer_name, customer_phone, customer_email, vehicle_interest, source }) {
+    const baseData = {
+        tenant_id: Number(tenant_id) || 1,
+        customer_name: customer_name || 'External Lead',
+        customer_phone: customer_phone || null,
+        customer_email: customer_email || null,
+        vehicle_interest: vehicle_interest || null,
+        source,
+        status: 'new',
+        ai_score: Math.floor(Math.random() * 25) + 65, // 65–90 for integration leads
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    };
+
+    if (Lead) {
+        try {
+            return await Lead.query().insertAndFetch(baseData);
+        } catch (e) {
+            logger.warn({ err: e.message }, 'DB insert failed — using mock lead');
+        }
+    }
+
+    return { id: `INT-${Date.now()}`, ...baseData };
+}
+
 
 // MOCK Database for demonstration
 let mockIntegrations = {
@@ -77,11 +107,11 @@ router.post('/webhook/inbound-email/:tenant_id', async (req, res) => {
         logger.info(`[INBOUND EMAIL] Received for Tenant ${tenant_id} from ${from}.`);
 
         // A) Parse Logic
-        let source = 'email_unknown';
-        if (from.includes('autotrader.co.za') || subject.includes('Autotrader')) source = 'autotrader';
-        else if (from.includes('cars.co.za') || subject.includes('Cars.co.za')) source = 'cars_coza';
+        let source = 'website'; // fallback source
+        if (from && (from.includes('autotrader.co.za') || subject.includes('Autotrader'))) source = 'autotrader';
+        else if (from && (from.includes('cars.co.za') || subject.includes('Cars.co.za'))) source = 'cars_coza';
 
-        // Extract using basic Regex logic typical for these structured emails
+        // Extract using basic Regex — typical for structured Autotrader/Cars.co.za emails
         const nameMatch = text.match(/Name:\s*(.+)/i);
         const phoneMatch = text.match(/Phone:\s*([0-9\+\s]+)/i);
         const emailMatch = text.match(/Email:\s*([^\s]+@[^\s]+)/i);
@@ -92,33 +122,36 @@ router.post('/webhook/inbound-email/:tenant_id', async (req, res) => {
         const customerEmail = emailMatch ? emailMatch[1].trim() : '';
         const vehicleInterest = vehicleMatch ? vehicleMatch[1].trim() : 'Unknown Vehicle';
 
-        // B) Create Lead (Simulated DB Insert)
-        const mockLead = {
-            id: `LD-${Date.now()}`,
-            name: customerName,
-            phone: customerPhone,
-            email: customerEmail,
-            vehicle: vehicleInterest,
-            source: source,
-            ai_score: Math.floor(Math.random() * 30) + 60, // 60-90 score
-            summary: `Automated ${source} extraction.`
-        };
+        // B) Persist lead to DB
+        const lead = await insertLead({
+            tenant_id,
+            customer_name: customerName,
+            customer_phone: customerPhone,
+            customer_email: customerEmail,
+            vehicle_interest: vehicleInterest,
+            source,
+        });
 
         if (source === 'autotrader') mockIntegrations.autotrader.leads_this_month++;
         if (source === 'cars_coza') mockIntegrations.cars_coza.leads_this_month++;
 
-        // C) Trigger Chatbot WhatsApp message immediately via WhatsApp Service
+        // C) Trigger WhatsApp chatbot immediately
         if (customerPhone) {
-            // Simulate 60s delay via setImmediate or just fire now
             setTimeout(async () => {
-                await whatsappService.sendText(tenant_id, customerPhone, `Hi ${customerName.split(' ')[0]}, thanks for your enquiry regarding the ${vehicleInterest} via ${source === 'autotrader' ? 'Autotrader' : 'Cars.co.za'}. I'm the KenganAuto AI Assistant! Are you looking to finance this vehicle or trade-in your current one?`);
-            }, 2000); // 2 seconds for demo speed
+                await whatsappService.sendText(Number(tenant_id), customerPhone, `Hi ${customerName.split(' ')[0]}, thanks for your enquiry regarding the ${vehicleInterest} via ${source === 'autotrader' ? 'Autotrader' : 'Cars.co.za'}. I'm the KenganAuto AI Assistant! Are you looking to finance this vehicle or trade-in your current one?`);
+            }, 2000);
         }
 
-        // D) Notify Salesperson
-        await notificationService.triggerNewLeadAlert('sales@kenganauto.co.za', '0820000000', mockLead);
+        // D) Notify team (TODO: fetch real team email from tenant settings)
+        await notificationService.notifyLeadQualified({
+            tenant: { id: Number(tenant_id), name: 'KenganAuto' },
+            lead,
+            conversationId: null,
+            intent: 'VEHICLE_ENQUIRY',
+            channel: source,
+        });
 
-        res.json({ success: true, message: `Parsed lead via ${source}`, lead: mockLead });
+        res.json({ success: true, message: `Parsed lead via ${source}`, lead_id: lead.id });
     } catch (e) {
         logger.error(`Inbound Email Parse Error: ${e.message}`);
         res.status(500).json({ error: e.message });
@@ -135,28 +168,36 @@ router.post('/webhook/facebook/:tenant_id', async (req, res) => {
 
         logger.info(`[FB WEBHOOK] Received lead ad event.`);
 
-        // Simulating FB structural parsing
-        const mockLead = {
-            id: `FB-${Date.now()}`,
-            name: req.body.name || 'Facebook Lead',
-            phone: req.body.phone || '+27821234567',
-            vehicle: req.body.vehicle || 'Facebook Ad Vehicle',
+        const customerName = req.body.name || 'Facebook Lead';
+        const customerPhone = req.body.phone || '';
+        const vehicleInterest = req.body.vehicle || 'Facebook Ad Vehicle';
+
+        // Persist lead to DB
+        const lead = await insertLead({
+            tenant_id,
+            customer_name: customerName,
+            customer_phone: customerPhone,
+            vehicle_interest: vehicleInterest,
             source: 'facebook',
-            ai_score: 85,
-            summary: 'Extracted from Facebook Lead Ads Webhook.'
-        };
+        });
 
         mockIntegrations.facebook.leads_this_month++;
 
-        if (mockLead.phone) {
+        if (customerPhone) {
             setTimeout(async () => {
-                await whatsappService.sendText(tenant_id, mockLead.phone, `Hi ${mockLead.name.split(' ')[0]}, thanks for clicking our Facebook Ad regarding the ${mockLead.vehicle}. I'm the KenganAuto AI Assistant! Can I help you book a test drive?`);
+                await whatsappService.sendText(Number(tenant_id), customerPhone, `Hi ${customerName.split(' ')[0]}, thanks for clicking our Facebook Ad regarding the ${vehicleInterest}. I'm the KenganAuto AI Assistant! Can I help you book a test drive?`);
             }, 2000);
         }
 
-        await notificationService.triggerNewLeadAlert('sales@kenganauto.co.za', '0820000000', mockLead);
+        await notificationService.notifyLeadQualified({
+            tenant: { id: Number(tenant_id), name: 'KenganAuto' },
+            lead,
+            conversationId: null,
+            intent: 'VEHICLE_ENQUIRY',
+            channel: 'facebook',
+        });
 
-        res.json({ success: true, message: 'Facebook Lead processed.' });
+        res.json({ success: true, message: 'Facebook Lead processed.', lead_id: lead.id });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -175,26 +216,31 @@ router.post('/webhook/generic/:tenant_id', async (req, res) => {
 
         logger.info(`[GENERIC WEBHOOK] Received lead from ${source || 'generic_api'}.`);
 
-        const mockLead = {
-            id: `GEN-${Date.now()}`,
-            name: customer_name,
-            phone: customer_phone,
-            email: customer_email || '',
-            vehicle: vehicle_interest || 'Unknown',
-            source: source || 'generic_webhook',
-            ai_score: 75,
-            summary: 'Ingested via Generic API Webhook.'
-        };
+        // Persist lead to DB
+        const lead = await insertLead({
+            tenant_id,
+            customer_name,
+            customer_phone,
+            customer_email: customer_email || null,
+            vehicle_interest: vehicle_interest || null,
+            source: source || 'website',
+        });
 
         mockIntegrations.generic_webhook.leads_this_month++;
 
         setTimeout(async () => {
-            await whatsappService.sendText(tenant_id, customer_phone, `Hi ${customer_name.split(' ')[0]}, thanks for your enquiry regarding the ${mockLead.vehicle}. I'm the KenganAuto AI Assistant. How can we assist you today?`);
+            await whatsappService.sendText(Number(tenant_id), customer_phone, `Hi ${customer_name.split(' ')[0]}, thanks for your enquiry regarding the ${lead.vehicle_interest || 'vehicle'}. I'm the KenganAuto AI Assistant. How can we assist you today?`);
         }, 2000);
 
-        await notificationService.triggerNewLeadAlert('sales@kenganauto.co.za', '0820000000', mockLead);
+        await notificationService.notifyLeadQualified({
+            tenant: { id: Number(tenant_id), name: 'KenganAuto' },
+            lead,
+            conversationId: null,
+            intent: 'VEHICLE_ENQUIRY',
+            channel: source || 'website',
+        });
 
-        res.json({ success: true, message: 'Webook Lead successfully created and chatbot triggered.' });
+        res.json({ success: true, message: 'Webhook lead successfully created and chatbot triggered.', lead_id: lead.id });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }

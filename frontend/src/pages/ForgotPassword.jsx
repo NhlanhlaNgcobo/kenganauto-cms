@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Magnetic } from '../components/motion';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email.trim()) { setError('Email is required.'); return; }
@@ -16,7 +15,7 @@ const ForgotPassword = () => {
         setIsLoading(true);
 
         try {
-            const res = await fetch(
+            await fetch(
                 `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/forgot-password`,
                 {
                     method: 'POST',
@@ -60,11 +59,8 @@ const ForgotPassword = () => {
                     {!sent ? (
                         <>
                             <div className="mb-8">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: 'rgba(201,168,76,0.5)' }}>
-                                    Password Recovery
-                                </p>
                                 <h2 className="font-outfit font-black text-2xl text-white">Forgot your password?</h2>
-                                <p className="text-sm mt-2" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                                <p className="text-sm mt-4" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     Enter your email and we'll send a reset link valid for 15 minutes.
                                 </p>
                             </div>
@@ -79,25 +75,27 @@ const ForgotPassword = () => {
 
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] block" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                         Email Address
                                     </label>
                                     <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.4)' }} />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2" size={16} style={{ color: 'rgba(201,168,76,0.8)' }} />
                                         <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                                             placeholder="name@dealership.co.za" className="lux-input pl-11" required />
                                     </div>
                                 </div>
 
-                                <button type="submit" disabled={isLoading}
-                                    className="w-full py-4 font-outfit font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-60"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
-                                        color: '#0A0F1E',
-                                        boxShadow: '0 8px 32px rgba(201,168,76,0.25)',
-                                    }}>
-                                    {isLoading ? 'Sending…' : (<>Send Reset Link <ArrowRight size={17} /></>)}
-                                </button>
+                                <Magnetic strength={0.25} className="w-full">
+                                    <button type="submit" disabled={isLoading}
+                                        className="w-full py-4 font-outfit font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 rounded-2xl transition-all disabled:opacity-60"
+                                        style={{
+                                            background: 'linear-gradient(135deg, #C9A84C 0%, #9A7830 100%)',
+                                            color: '#0A0F1E',
+                                            boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
+                                        }}>
+                                        {isLoading ? 'Sending…' : (<>Send Reset Link <ArrowRight size={17} /></>)}
+                                    </button>
+                                </Magnetic>
                             </form>
                         </>
                     ) : (
@@ -108,7 +106,7 @@ const ForgotPassword = () => {
                             </div>
                             <div>
                                 <h2 className="font-outfit font-black text-2xl text-white mb-2">Check your inbox</h2>
-                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                                <p className="text-sm" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                     If <span className="font-bold text-white">{email}</span> is registered, a reset link has been sent. It expires in 15 minutes.
                                 </p>
                             </div>
@@ -117,8 +115,8 @@ const ForgotPassword = () => {
 
                     <div className="mt-8 pt-6 text-center" style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}>
                         <Link to="/login"
-                            className="inline-flex items-center gap-2 text-[11px] font-bold transition-colors"
-                            style={{ color: 'rgba(201,168,76,0.5)' }}>
+                            className="inline-flex items-center gap-2 text-[12px] font-bold transition-colors"
+                            style={{ color: 'rgba(201,168,76,0.8)' }}>
                             <ArrowLeft size={13} /> Back to Login
                         </Link>
                     </div>

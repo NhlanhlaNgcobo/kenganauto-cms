@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Mail, MessageCircle, Smartphone, Clock, Eye, Send, ShieldAlert, CheckCircle2, ChevronDown, Bell } from 'lucide-react';
+
 import { useAuth } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -15,19 +16,17 @@ const ROLES = [
 ];
 
 export default function NotificationSettings() {
-    const { user, token } = useAuth();
+    const { token } = useAuth();
     const [settings, setSettings] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+    const [_saving, setSaving] = useState(false);
 
     // Test modal state
     const [testModal, setTestModal] = useState(false);
     const [testPayload, setTestPayload] = useState({ channel: 'email', destination: '' });
     const [testStatus, setTestStatus] = useState('');
 
-    useEffect(() => { loadSettings(); }, []);
-
-    const loadSettings = async () => {
+    async function loadSettings() {
         try {
             const res = await axios.get(`${API_URL}/api/notifications/settings`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -35,7 +34,9 @@ export default function NotificationSettings() {
             setSettings(res.data.settings);
         } catch (e) { console.error('Error fetching notification settings:', e); }
         setLoading(false);
-    };
+    }
+
+    useEffect(() => { loadSettings(); }, []);
 
     const handleSave = async (updatedSettings) => {
         setSaving(true);
@@ -79,7 +80,7 @@ export default function NotificationSettings() {
             });
             setTestStatus('Dispatched Successfully');
             setTimeout(() => setTestModal(false), 2000);
-        } catch (e) {
+        } catch {
             setTestStatus('Failed to send');
         }
     };
@@ -93,16 +94,16 @@ export default function NotificationSettings() {
     const renderCard = (channelName, icon, dataKey, definitions) => (
         <div className="bg-black/30 border border-white/5 rounded-2xl overflow-hidden mb-8">
             <div className="bg-white/5 px-6 py-4 flex items-center justify-between border-b border-white/5">
-                <h3 className="font-outfit font-black text-white uppercase tracking-widest flex items-center gap-3">
+                <h2 className="font-outfit font-black text-white uppercase tracking-widest flex items-center gap-3">
                     {icon} {channelName} Triggers
-                </h3>
+                </h2>
             </div>
             <div className="divide-y divide-white/5">
                 {definitions.map((def, i) => (
                     <div key={i} className="p-6 flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center hover:bg-white/5 transition-colors">
                         <div className="flex-1">
-                            <h4 className="font-bold text-white mb-1 tracking-wider">{def.title}</h4>
-                            <p className="text-[10px] text-white/50 uppercase font-black tracking-widest leading-relaxed max-w-lg">{def.desc}</p>
+                            <h3 className="font-bold text-white mb-1 tracking-wider">{def.title}</h3>
+                            <p className="text-[13px] text-white/66 leading-relaxed max-w-lg">{def.desc}</p>
                         </div>
 
                         <div className="flex flex-col gap-3 min-w-[280px]">
@@ -113,8 +114,8 @@ export default function NotificationSettings() {
                                     // Make Customers locked for certain hard-coded routes? Simple UI: just toggle everything
                                     return (
                                         <button key={r.id} onClick={() => toggleRole(dataKey, def.key, r.id)}
-                                            className={`px-2 py-1 text-[9px] uppercase font-bold tracking-widest rounded transition-all border
-                                                ${isSelected ? 'bg-[#C9A84C]/20 border-[#C9A84C]/50 text-[#C9A84C]' : 'bg-transparent border-white/10 text-white/30 hover:text-white hover:border-white/30'}`}>
+                                            className={`px-2 py-1 text-[11px] uppercase font-bold tracking-widest rounded transition-all border
+                                                ${isSelected ? 'bg-[#C9A84C]/20 border-[#C9A84C]/50 text-[#C9A84C]' : 'bg-transparent border-white/10 text-white/58 hover:text-white hover:border-white/30'}`}>
                                             {r.label}
                                         </button>
                                     );
@@ -144,10 +145,9 @@ export default function NotificationSettings() {
 
             <div className="flex justify-between items-end mb-8 pt-2 relative">
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-1.5" style={{ color: 'rgba(201,168,76,0.6)' }}>Settings & Routing</p>
                     <h1 className="font-outfit font-black text-3xl text-white tracking-wide">Communication Triggers</h1>
                 </div>
-                <button onClick={() => setTestModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/20 text-xs">
+                <button onClick={() => setTestModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors text-xs">
                     <Send size={14} /> Send Global Test
                 </button>
             </div>
@@ -155,18 +155,18 @@ export default function NotificationSettings() {
             {/* ROUTING HOURS LOCK */}
             <div className="bg-black/40 border border-[#C9A84C]/30 p-6 rounded-2xl mb-8 flex items-center justify-between">
                 <div>
-                    <h3 className="font-outfit font-black text-[#C9A84C] uppercase tracking-widest mb-1 flex items-center gap-2"><Clock size={16} /> Staff Silent Hours Routing</h3>
-                    <p className="text-[10px] uppercase font-bold text-white/50 tracking-widest">During silent hours, WhatsApp triggers to staff will be suppressed or held in the dashboard queue.</p>
+                    <h2 className="font-outfit font-black text-[#C9A84C] uppercase tracking-widest mb-1 flex items-center gap-2"><Clock size={16} /> Staff Silent Hours Routing</h2>
+                    <p className="text-[13px] text-white/66 leading-relaxed max-w-[65ch]">During silent hours, WhatsApp triggers to staff will be suppressed or held in the dashboard queue.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex flex-col">
-                        <span className="text-[9px] uppercase font-bold text-white/40 mb-1 tracking-widest">Active From</span>
+                        <span className="text-[11px] uppercase font-bold text-white/58 mb-1 tracking-widest">Active From</span>
                         <input type="time" value={settings.hours.start} onChange={(e) => handleHoursChange('start', e.target.value)}
                             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#C9A84C]" />
                     </div>
-                    <span className="text-white/20 mt-4">—</span>
+                    <span className="text-white/58 mt-4">—</span>
                     <div className="flex flex-col">
-                        <span className="text-[9px] uppercase font-bold text-white/40 mb-1 tracking-widest">Active Until</span>
+                        <span className="text-[11px] uppercase font-bold text-white/58 mb-1 tracking-widest">Active Until</span>
                         <input type="time" value={settings.hours.end} onChange={(e) => handleHoursChange('end', e.target.value)}
                             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#C9A84C]" />
                     </div>
@@ -210,7 +210,7 @@ export default function NotificationSettings() {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-[#C9A84C] mb-2 block">Notification Channel</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-[#C9A84C] mb-2 block">Notification Channel</label>
                                 <select value={testPayload.channel} onChange={(e) => setTestPayload({ ...testPayload, channel: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm focus:border-blue-500 outline-none hover:bg-white/10 transition-colors">
                                     <option value="email">Email Routing (Resend API)</option>
                                     <option value="whatsapp">WhatsApp Cloud (360dialog)</option>
@@ -218,14 +218,14 @@ export default function NotificationSettings() {
                                 </select>
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-[#C9A84C] mb-2 block">Destination (Email or Mobile)</label>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-[#C9A84C] mb-2 block">Destination (Email or Mobile)</label>
                                 <input type="text" value={testPayload.destination} onChange={(e) => setTestPayload({ ...testPayload, destination: e.target.value })} placeholder="+27 82 555 1234 or email@..." className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white font-mono text-sm focus:border-blue-500 outline-none transition-colors" />
                             </div>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-8">
                             <button onClick={() => { setTestModal(false); setTestStatus(''); }} className="px-4 py-2 border border-white/10 rounded-lg text-white text-xs font-bold hover:bg-white/5 transition-colors uppercase tracking-wider">Cancel</button>
-                            <button onClick={sendTestNotification} disabled={!testPayload.destination} className="px-5 py-2 bg-blue-500 text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-row items-center gap-2">
+                            <button onClick={sendTestNotification} disabled={!testPayload.destination} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-black uppercase tracking-wider hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-row items-center gap-2">
                                 {testStatus || 'Dispatch Simulation'} <Send size={14} />
                             </button>
                         </div>

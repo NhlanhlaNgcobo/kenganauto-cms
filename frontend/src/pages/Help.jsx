@@ -32,10 +32,10 @@ const Help = () => {
             {/* Header */}
             <div className="max-w-4xl mx-auto mb-12 text-center">
                 <h1 className="font-outfit font-black text-4xl mb-4">KenganAuto Help Centre</h1>
-                <p className="text-white/50 mb-8">Everything you need to set up, manage, and scale your dealership on our platform.</p>
+                <p className="text-white/58 mb-8">Everything you need to set up, manage, and scale your dealership on our platform.</p>
 
                 <div className="relative max-w-2xl mx-auto">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40" size={20} />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/58" size={20} />
                     <input
                         type="text"
                         placeholder="Search for articles, guides or FAQs..."
@@ -50,24 +50,24 @@ const Help = () => {
                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-[#C9A84C] mb-4 group-hover:bg-[#C9A84C] group-hover:text-[#0A0F1E] transition-colors">
                         <MessageCircle size={24} />
                     </div>
-                    <h3 className="font-bold text-lg mb-2">WhatsApp Setup</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">Connect your 360dialog API key to enable instant WhatsApp messaging.</p>
+                    <h2 className="font-bold text-lg mb-2">WhatsApp Setup</h2>
+                    <p className="text-sm text-white/58 leading-relaxed">Connect your 360dialog API key to enable instant WhatsApp messaging.</p>
                 </div>
 
                 <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6 hover:border-[#C9A84C]/50 transition-colors cursor-pointer group">
                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-emerald-400 mb-4 group-hover:bg-emerald-400 group-hover:text-[#0A0F1E] transition-colors">
                         <Link size={24} />
                     </div>
-                    <h3 className="font-bold text-lg mb-2">Website Widget</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">Embed our lead-capture script into your native dealership site.</p>
+                    <h2 className="font-bold text-lg mb-2">Website Widget</h2>
+                    <p className="text-sm text-white/58 leading-relaxed">Embed our lead-capture script into your native dealership site.</p>
                 </div>
 
                 <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6 hover:border-[#C9A84C]/50 transition-colors cursor-pointer group">
                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-400 group-hover:text-[#0A0F1E] transition-colors">
                         <Users size={24} />
                     </div>
-                    <h3 className="font-bold text-lg mb-2">Team Management</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">Manage access controls for sales agents, finance, and admins.</p>
+                    <h2 className="font-bold text-lg mb-2">Team Management</h2>
+                    <p className="text-sm text-white/58 leading-relaxed">Manage access controls for sales agents, finance, and admins.</p>
                 </div>
             </div>
 
@@ -79,16 +79,16 @@ const Help = () => {
                         {faqs.map((faq) => (
                             <div key={faq.id} className="bg-[#111A30] border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 shadow-md">
                                 <button
-                                    className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none"
+                                    className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-white/5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C9A84C]"
+                                    aria-expanded={openFaq === faq.id}
+                                    aria-controls={`faq-${faq.id}`}
                                     onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
                                 >
                                     <span className="font-bold text-[15px] pr-4">{faq.q}</span>
-                                    {openFaq === faq.id ? <ChevronUp size={20} className="text-[#C9A84C] shrink-0" /> : <ChevronDown size={20} className="text-white/30 shrink-0" />}
+                                    {openFaq === faq.id ? <ChevronUp size={20} className="text-[#C9A84C] shrink-0" /> : <ChevronDown size={20} className="text-white/58 shrink-0" />}
                                 </button>
-                                <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === faq.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    <p className="px-6 pb-6 text-sm text-white/60 leading-relaxed border-t border-white/5 pt-4">
+                                <div id={`faq-${faq.id}`} hidden={openFaq !== faq.id}>
+                                    <p className="px-6 pb-6 text-sm text-white/66 leading-relaxed border-t border-white/5 pt-4">
                                         {faq.a}
                                     </p>
                                 </div>
@@ -101,8 +101,8 @@ const Help = () => {
                 <div className="w-full md:w-80 space-y-6">
                     <div className="bg-gradient-to-br from-[#1A2235] to-[#0B1120] border border-[#C9A84C]/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A84C] opacity-5 rounded-full blur-3xl rounded-tl-none -mr-16 -mt-16 pointer-events-none"></div>
-                        <h3 className="font-outfit font-black text-xl mb-2 text-white">Need Live Help?</h3>
-                        <p className="text-sm text-white/50 mb-6">Our dedicated support team is available on WhatsApp or directly via our integrated Chat Support Widget on the bottom right.</p>
+                        <h2 className="font-outfit font-black text-xl mb-2 text-white">Need Live Help?</h2>
+                        <p className="text-sm text-white/58 mb-6">Our dedicated support team is available on WhatsApp or directly via our integrated Chat Support Widget on the bottom right.</p>
 
                         <div className="space-y-3">
                             <button
@@ -118,11 +118,11 @@ const Help = () => {
                     </div>
 
                     <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6">
-                        <h4 className="font-bold text-sm uppercase tracking-wider text-white/30 mb-4">Popular Guides</h4>
+                        <h3 className="font-bold text-sm uppercase tracking-wider text-white/58 mb-4">Popular Guides</h3>
                         <ul className="space-y-3">
-                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Full Setup Walkthrough</a></li>
-                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Dealing with Lead Duplicates</a></li>
-                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Understanding AI Scoring</a></li>
+                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/66 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Full Setup Walkthrough</a></li>
+                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/66 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Dealing with Lead Duplicates</a></li>
+                            <li><a href="#" className="flex items-center gap-2 text-sm text-white/66 hover:text-[#C9A84C] transition-colors"><ExternalLink size={14} /> Understanding AI Scoring</a></li>
                         </ul>
                     </div>
                 </div>

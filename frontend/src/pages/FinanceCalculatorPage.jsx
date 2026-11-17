@@ -66,23 +66,23 @@ export default function FinanceCalculatorPage() {
                             <span className="text-white">Finance</span>
                             <span className="ml-2 gold-text">Calculator</span>
                         </h1>
-                        <p className="text-[9px] tracking-[0.25em] uppercase mt-0.5" style={{ color: 'rgba(201,168,76,0.4)' }}>
+                        <p className="text-[11px] tracking-[0.25em] uppercase mt-0.5" style={{ color: 'rgba(201,168,76,0.8)' }}>
                             NCA · NCR Compliant · South Africa
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold"
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold"
                         style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', color: '#4ADE80' }}>
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 6px rgba(74,222,128,0.8)' }} />
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: 'none' }} />
                         NCR Reg. Active
                     </div>
                     <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-wider transition-all"
                         style={{
                             background: 'linear-gradient(135deg,#C9A84C,#9A7830)',
                             color: '#0A0F1E',
-                            boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.3)',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 28px rgba(201,168,76,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                         onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,168,76,0.25)'; e.currentTarget.style.transform = 'none'; }}>
@@ -97,7 +97,7 @@ export default function FinanceCalculatorPage() {
                     style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
                     <div>
                         <p className="text-sm font-black text-green-400">Finance Quote Ready!</p>
-                        <p className="text-xs text-white/50 mt-0.5">
+                        <p className="text-xs text-white/58 mt-0.5">
                             Monthly: R{applyResult.monthly.toLocaleString()} | APR: {applyResult.apr}% | Total: R{applyResult.totalRepayable.toLocaleString()}
                         </p>
                     </div>
@@ -126,11 +126,10 @@ export default function FinanceCalculatorPage() {
                         <div className="luxury-card p-6">
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="p-2.5 rounded-xl" style={{ background: 'rgba(59,127,245,0.1)', border: '1px solid rgba(59,127,245,0.2)' }}>
-                                    <BarChart2 size={16} style={{ color: '#3B7FF5' }} />
+                                    <BarChart2 size={16} style={{ color: '#60A5FA' }} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'rgba(201,168,76,0.5)' }}>Market Rates</p>
-                                    <h3 className="font-outfit font-bold text-base text-white">SA Bank Rate Comparison</h3>
+                                    <h2 className="font-outfit font-bold text-base text-white">SA Bank Rate Comparison</h2>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -141,11 +140,11 @@ export default function FinanceCalculatorPage() {
                                         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.04)'; }}>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-bold text-white">{bank.name}</p>
-                                            <p className="text-[10px]" style={{ color: 'rgba(240,237,232,0.3)' }}>{bank.note}</p>
+                                            <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>{bank.note}</p>
                                         </div>
                                         <div className="text-right flex-shrink-0">
                                             <p className="text-sm font-black" style={{ color: '#C9A84C' }}>{bank.rate.toFixed(2)}%</p>
-                                            <p className="text-[10px]" style={{ color: 'rgba(240,237,232,0.25)' }}>
+                                            <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                                 Prime +{(bank.rate - SA_PRIME).toFixed(1)}%
                                             </p>
                                         </div>
@@ -160,7 +159,7 @@ export default function FinanceCalculatorPage() {
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-[9px] mt-4" style={{ color: 'rgba(240,237,232,0.2)' }}>
+                            <p className="text-[12px] mt-4" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 Rates are indicative and vary based on applicant credit profile, vehicle type, age, and value. Prime rate: {SA_PRIME}% (SARB · March 2026).
                             </p>
                         </div>
@@ -172,18 +171,17 @@ export default function FinanceCalculatorPage() {
                                     <Shield size={16} style={{ color: '#4ADE80' }} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'rgba(201,168,76,0.5)' }}>Regulatory</p>
-                                    <h3 className="font-outfit font-bold text-base text-white">NCA Quick Reference</h3>
+                                    <h2 className="font-outfit font-bold text-base text-white">NCA Quick Reference</h2>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 {NCA_FACTS.map((fact, i) => (
                                     <div key={i} className="p-3 rounded-xl"
                                         style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <p className="text-[9px] font-black uppercase tracking-widest mb-1"
-                                            style={{ color: 'rgba(240,237,232,0.3)' }}>{fact.title}</p>
+                                        <p className="text-[11px] font-black uppercase tracking-widest mb-1"
+                                            style={{ color: 'rgba(240,237,232,0.62)' }}>{fact.title}</p>
                                         <p className="font-outfit font-black text-lg text-white">{fact.value}</p>
-                                        <p className="text-[9px] mt-1" style={{ color: 'rgba(240,237,232,0.25)' }}>{fact.desc}</p>
+                                        <p className="text-[12px] mt-1" style={{ color: 'rgba(240,237,232,0.62)' }}>{fact.desc}</p>
                                     </div>
                                 ))}
                             </div>
@@ -196,8 +194,7 @@ export default function FinanceCalculatorPage() {
                                     <Zap size={16} style={{ color: '#C9A84C' }} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'rgba(201,168,76,0.5)' }}>KenganAuto Tips</p>
-                                    <h3 className="font-outfit font-bold text-base text-white">Maximise Your Finance Deal</h3>
+                                    <h2 className="font-outfit font-bold text-base text-white">Maximise Your Finance Deal</h2>
                                 </div>
                             </div>
                             <div className="space-y-3">
@@ -205,14 +202,14 @@ export default function FinanceCalculatorPage() {
                                     { tip: 'Increase your deposit to 20%+', impact: 'Reduces rate risk', color: '#22C55E' },
                                     { tip: 'Avoid 30% balloon unless you plan to sell/trade', impact: 'Higher total cost', color: '#F87171' },
                                     { tip: 'Pre-qualify before visiting the dealership', impact: 'Strong negotiating position', color: '#C9A84C' },
-                                    { tip: 'Request a linked (variable) rate in a falling market', impact: 'Rate follows prime down', color: '#3B7FF5' },
+                                    { tip: 'Request a linked (variable) rate in a falling market', impact: 'Rate follows prime down', color: '#60A5FA' },
                                     { tip: 'FICA documents ready: ID, 3 months payslips, 3 months bank statements', impact: 'Faster approval', color: '#A855F7' },
                                 ].map(({ tip, impact, color }, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <div className="w-1 h-1 rounded-full flex-shrink-0 mt-2" style={{ background: color }} />
                                         <div>
                                             <p className="text-xs font-bold text-white/70">{tip}</p>
-                                            <p className="text-[10px]" style={{ color: 'rgba(240,237,232,0.3)' }}>{impact}</p>
+                                            <p className="text-[12px]" style={{ color: 'rgba(240,237,232,0.62)' }}>{impact}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -229,9 +226,9 @@ export default function FinanceCalculatorPage() {
                                 style={{ background: 'linear-gradient(90deg, transparent, rgba(59,127,245,0.4), transparent)' }} />
                             <div className="flex items-center gap-3 mb-3">
                                 <Share2 size={16} style={{ color: '#60A5FA' }} />
-                                <h3 className="font-outfit font-bold text-base text-white">Dealership Website Widget</h3>
+                                <h2 className="font-outfit font-bold text-base text-white">Dealership Website Widget</h2>
                             </div>
-                            <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(240,237,232,0.4)' }}>
+                            <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(240,237,232,0.62)' }}>
                                 Add a branded finance calculator to your dealership website with one line of code.
                                 Captures leads directly into your KenganAuto CRM.
                             </p>

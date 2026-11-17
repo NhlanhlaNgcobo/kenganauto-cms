@@ -29,10 +29,16 @@ function signToken(user, tenantId) {
    POST /auth/login
    ───────────────────────────────────────────────────────────── */
 router.post('/login', async (req, res) => {
-    const { email, password, subdomain } = req.body;
+    let { email, password, subdomain } = req.body;
     if (!email || !password || !subdomain) {
         return res.status(400).json({ error: 'Email, password and subdomain are required.' });
     }
+    // Be forgiving of copy/paste and autofill: trim surrounding whitespace and
+    // normalise the subdomain (lowercased). Passwords only have surrounding
+    // whitespace stripped — never internal characters.
+    email = String(email).toLowerCase().trim();
+    subdomain = String(subdomain).toLowerCase().trim();
+    password = String(password).trim();
 
     try {
         const tenant = await Tenant.query().where('subdomain', subdomain).first();
@@ -41,7 +47,7 @@ router.post('/login', async (req, res) => {
         }
 
         const user = await User.query()
-            .where('email', email.toLowerCase().trim())
+            .where('email', email)
             .where('tenant_id', tenant.id)
             .where('active', true)
             .first();

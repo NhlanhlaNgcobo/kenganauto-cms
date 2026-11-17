@@ -39,9 +39,22 @@ function defaultConfig(tenantId) {
    GET /api/widget/config/:tenant_id
    Public — called by widget.js at load time (no auth required)
    ───────────────────────────────────────────────────────────── */
-router.get('/config/:tenant_id', (req, res) => {
+router.get('/config/:tenant_id', async (req, res) => {
     const tenantId = Number(req.params.tenant_id);
-    const config = widgetConfigs.get(tenantId) || defaultConfig(tenantId);
+    let config = widgetConfigs.get(tenantId);
+    if (!config) {
+        // Unconfigured tenants get their own name/brand colour instead of KenganAuto defaults
+        config = defaultConfig(tenantId);
+        try {
+            const t = await require('../config/db')('tenants').where({ id: tenantId }).first();
+            if (t) {
+                config.dealership_name = t.name;
+                config.greeting = `Hi! I'm the ${t.name} virtual assistant. Ask me about any car in stock, finance, trade-ins or booking a service.`;
+                if (t.primary_color) { config.accent_color = t.primary_color; config.bubble_color = '#0B0D10'; }
+                if (t.whatsapp_number) config.whatsapp_number = t.whatsapp_number;
+            }
+        } catch { /* keep defaults */ }
+    }
     // Return only the fields the public widget needs
     return res.json({
         tenant_id: config.tenant_id,

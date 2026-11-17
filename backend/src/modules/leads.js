@@ -15,6 +15,7 @@
  */
 
 const express = require('express');
+const { recordStaffTouch } = require('../services/lead_touch');
 const router = express.Router();
 const { authenticate, requireRole } = require('../middleware/auth');
 const { AIEngine } = require('../services/ai_engine');
@@ -75,6 +76,8 @@ function hoursAgo(isoString) {
 }
 
 function isOverdue(lead) {
+    // Won/lost leads are closed — never "overdue for follow-up".
+    if (['won', 'lost'].includes(lead.status)) return false;
     const lastContact = lead.last_contact_at;
     if (!lastContact && lead.status === 'new') {
         return hoursAgo(lead.created_at) > 24;
@@ -87,7 +90,70 @@ async function tryDB(fn, fallback) {
     try { return await fn(); } catch { return fallback(); }
 }
 
-/* ─── All routes require auth ─── */
+/* ─────────────────────────────────────────────────────────────
+   POST /api/leads/widget/:tenantId  — PUBLIC (no auth required)
+   Called by the embeddable finance-widget.js on external websites.
+   Creates a lead in the tenant's CRM from the finance widget form.
+   IMPORTANT: Must be defined BEFORE router.use(authenticate)
+   ───────────────────────────────────────────────────────────── */
+router.post('/widget/:tenantId', async (req, res) => {
+    const tenantId = Number(req.params.tenantId) || 1;
+    const { customer_name, customer_phone, customer_email, notes, metadata } = req.body;
+
+    if (!customer_name || !customer_phone) {
+        return res.status(400).json({ error: 'customer_name and customer_phone are required.' });
+    }
+
+    // Rate-limit: max 5 leads per IP per hour (basic check via in-memory map)
+    const ip = req.ip || 'unknown';
+    if (!router._widgetRateMap) router._widgetRateMap = new Map();
+    const now = Date.now();
+    const hits = (router._widgetRateMap.get(ip) || []).filter(t => now - t < 3_600_000);
+    if (hits.length >= 5) return res.status(429).json({ error: 'Too many requests. Try again in an hour.' });
+    router._widgetRateMap.set(ip, [...hits, now]);
+
+    const newLead = await tryDB(
+        () => Lead.query().insertAndFetch({
+            tenant_id: tenantId,
+            customer_name, customer_phone, customer_email,
+            source: 'website',
+            notes: notes || null,
+            status: 'new',
+            ai_score: 15, // widget leads start lower — rescore will update
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        }),
+        () => {
+            const lead = {
+                id: mockLeads.length + 1,
+                tenant_id: tenantId,
+                customer_name, customer_phone, customer_email,
+                source: 'website',
+                notes: notes || null,
+                status: 'new',
+                ai_score: 15,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                activity_log: [{ type: 'created', message: 'Lead from finance calculator widget', timestamp: new Date().toISOString() }],
+                overdue: false,
+            };
+            if (metadata) lead.finance_metadata = metadata;
+            mockLeads.push(lead);
+            return lead;
+        }
+    );
+
+    // Background score
+    setImmediate(async () => {
+        try {
+            await scorer.rescoreLead(newLead, tenantId, { id: tenantId, name: 'KenganAuto' }, []);
+        } catch { /* non-fatal */ }
+    });
+
+    return res.status(201).json({ ok: true, lead_id: newLead.id });
+});
+
+/* ─── All routes below require auth ─── */
 router.use(authenticate);
 
 /* ─────────────────────────────────────────────────────────────
@@ -132,12 +198,14 @@ router.get('/', async (req, res) => {
     const tenantId = req.user.tenant_id;
     const {
         status, source, assigned_to, search,
-        score_min, score_max, page = 1, limit = 50,
+        score_min, score_max, page = 1, limit = 50, include_archived,
     } = req.query;
+    const archiveCutoff = new Date(Date.now() - 30 * 86400000).toISOString();
 
     let leads = await tryDB(
         async () => {
             let q = Lead.query().where({ tenant_id: tenantId });
+            if (!include_archived) q = q.where(b => b.whereNotIn('status', ['won', 'lost']).orWhere('updated_at', '>=', archiveCutoff));
             if (status) q = q.where('status', status);
             if (source) q = q.where('source', source);
             if (assigned_to) q = q.where('assigned_to', Number(assigned_to));
@@ -341,6 +409,7 @@ router.patch('/:id/stage', async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ error: 'Lead not found.' });
+    await recordStaffTouch(tenantId, leadId, { status });
     return res.json({ ...updated, activity_log_entry: logEntry });
 });
 
@@ -412,6 +481,7 @@ router.post('/:id/notes', async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ error: 'Lead not found.' });
+    await recordStaffTouch(tenantId, leadId);
     return res.json({ ...updated, note_added: noteEntry });
 });
 
@@ -558,6 +628,8 @@ router.get('/:id/score', async (req, res) => {
     });
 });
 
+// NOTE: /bulk is intentionally placed BEFORE /:id routes to prevent Express
+// from matching 'bulk' as a lead ID param.
 router.post('/bulk', requireRole('admin'), async (req, res) => {
     const tenantId = req.user.tenant_id;
     const { ids, action, value } = req.body;
@@ -590,66 +662,8 @@ router.post('/bulk', requireRole('admin'), async (req, res) => {
     return res.json({ updated: results.filter(Boolean).length, total: ids.length });
 });
 
-/* ─────────────────────────────────────────────────────────────
-   POST /api/leads/widget/:tenantId  — PUBLIC (no auth required)
-   Called by the embeddable finance-widget.js on external websites.
-   Creates a lead in the tenant's CRM from the finance widget form.
-   ───────────────────────────────────────────────────────────── */
-router.post('/widget/:tenantId', async (req, res) => {
-    const tenantId = Number(req.params.tenantId) || 1;
-    const { customer_name, customer_phone, customer_email, notes, metadata } = req.body;
-
-    if (!customer_name || !customer_phone) {
-        return res.status(400).json({ error: 'customer_name and customer_phone are required.' });
-    }
-
-    // Rate-limit: max 5 leads per IP per hour (basic check via in-memory map)
-    const ip = req.ip || 'unknown';
-    if (!router._widgetRateMap) router._widgetRateMap = new Map();
-    const now = Date.now();
-    const hits = (router._widgetRateMap.get(ip) || []).filter(t => now - t < 3_600_000);
-    if (hits.length >= 5) return res.status(429).json({ error: 'Too many requests. Try again in an hour.' });
-    router._widgetRateMap.set(ip, [...hits, now]);
-
-    const newLead = await tryDB(
-        () => Lead.query().insertAndFetch({
-            tenant_id: tenantId,
-            customer_name, customer_phone, customer_email,
-            source: 'website',
-            notes: notes || null,
-            status: 'new',
-            ai_score: 15, // widget leads start lower — rescore will update
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        }),
-        () => {
-            const lead = {
-                id: mockLeads.length + 1,
-                tenant_id: tenantId,
-                customer_name, customer_phone, customer_email,
-                source: 'website',
-                notes: notes || null,
-                status: 'new',
-                ai_score: 15,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                activity_log: [{ type: 'created', message: 'Lead from finance calculator widget', timestamp: new Date().toISOString() }],
-                overdue: false,
-            };
-            if (metadata) lead.finance_metadata = metadata;
-            mockLeads.push(lead);
-            return lead;
-        }
-    );
-
-    // Background score
-    setImmediate(async () => {
-        try {
-            await scorer.rescoreLead(newLead, tenantId, { id: tenantId, name: 'KenganAuto' }, []);
-        } catch { /* non-fatal */ }
-    });
-
-    return res.status(201).json({ ok: true, lead_id: newLead.id });
-});
+/* ─── Widget route has been moved above router.use(authenticate) ─── */
+// See the route definition around line 90 in this file.
 
 module.exports = router;
+

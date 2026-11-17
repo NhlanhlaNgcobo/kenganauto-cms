@@ -1,0 +1,26 @@
+{
+  "revision": "j9ck6o",
+  "target": {
+    "id": "pr/f31fv9"
+  },
+  "kind": {
+    "tokens": [
+      "deck",
+      "slide",
+      "textbox",
+      "shape",
+      "table",
+      "chart",
+      "image",
+      "notes",
+      "thread"
+    ]
+  },
+  "include": {
+    "tokens": []
+  },
+  "exclude": {
+    "tokens": []
+  },
+  "notices": []
+}

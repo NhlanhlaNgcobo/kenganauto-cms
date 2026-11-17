@@ -13,15 +13,19 @@ router.get('/status', async (req, res) => {
     try {
         const tenant = req.tenant; // from tenantMiddleware
 
-        // Find usage for this month
         const Knex = require('objection').Model.knex();
         const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-
-        let usage = await Knex('tenant_usage')
-            .where({ tenant_id: tenant.id, billing_period: currentMonth })
-            .first();
-
         const limits = stripeService.getPlanLimits(tenant.plan);
+
+        // Fetch usage safely — table may not exist in all environments
+        let usage = null;
+        try {
+            usage = await Knex('tenant_usage')
+                .where({ tenant_id: tenant.id, billing_period: currentMonth })
+                .first();
+        } catch {
+            // tenant_usage table not yet migrated — return zero usage
+        }
 
         if (!usage) {
             usage = {

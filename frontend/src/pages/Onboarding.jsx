@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Confetti from 'react-confetti';
 import { MessageCircle, Car, Code, Users, CheckCircle, ChevronRight, Download, Upload, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -36,8 +36,6 @@ const Onboarding = () => {
         }, 4000); // 4 seconds of confetti before redirect
     };
 
-    const currentStepData = steps.find(s => s.id === currentStep);
-
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-[#080C17]"
             style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(201,168,76,0.05) 0%, transparent 70%)' }}>
@@ -50,22 +48,22 @@ const Onboarding = () => {
                 <div className="w-full md:w-1/3 bg-[#111A30] p-8 border-r border-white/5 flex flex-col">
                     <div className="mb-12">
                         <h2 className="font-outfit font-black text-2xl text-white">Welcome,<br /><span className="text-[#C9A84C]">{user?.first_name || 'Dealer'}</span></h2>
-                        <p className="text-white/40 text-sm mt-2">Let's set up your KenganAuto OS in just a few steps.</p>
+                        <p className="text-white/58 text-sm mt-2">Let's set up your KenganAuto OS in just a few steps.</p>
                     </div>
 
                     <div className="flex-1 space-y-6">
                         {steps.map(step => (
-                            <div key={step.id} className={`flex items-center gap-4 transition-opacity ${step.id > currentStep ? 'opacity-30' : 'opacity-100'}`}>
+                            <div key={step.id} className={`flex items-center gap-4 transition-opacity ${step.id > currentStep ? 'opacity-80' : 'opacity-100'}`}>
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors
                   ${step.id === currentStep ? 'border-[#C9A84C] text-[#C9A84C] bg-[#C9A84C]/10' :
-                                        step.id < currentStep ? 'border-emerald-400 text-emerald-400 bg-emerald-400/10' : 'border-white/10 text-white/50 bg-white/5'}`}>
+                                        step.id < currentStep ? 'border-emerald-400 text-emerald-400 bg-emerald-400/10' : 'border-white/10 text-white/58 bg-white/5'}`}>
                                     {step.id < currentStep ? <CheckCircle size={18} /> : <step.icon size={18} />}
                                 </div>
                                 <div>
-                                    <p className={`text-sm font-bold uppercase tracking-wider ${step.id === currentStep ? 'text-white' : 'text-white/50'}`}>
+                                    <p className={`text-sm font-bold uppercase tracking-wider ${step.id === currentStep ? 'text-white' : 'text-white/58'}`}>
                                         Step {step.id}
                                     </p>
-                                    <p className={`text-xs ${step.id === currentStep ? 'text-[#C9A84C]' : 'text-white/30'}`}>
+                                    <p className={`text-xs ${step.id === currentStep ? 'text-[#C9A84C]' : 'text-white/58'}`}>
                                         {step.title}
                                     </p>
                                 </div>
@@ -90,16 +88,16 @@ const Onboarding = () => {
                             {currentStep === 1 && (
                                 <div className="space-y-6">
                                     <h3 className="font-outfit font-black text-3xl text-white">Connect WhatsApp</h3>
-                                    <p className="text-white/50">Link your 360dialog account to capture leads automatically.</p>
+                                    <p className="text-white/58">Link your 360dialog account to capture leads automatically.</p>
 
                                     <div className="space-y-4 pt-4">
                                         <div>
-                                            <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">360dialog API Key</label>
+                                            <label className="block text-xs font-bold text-white/58 uppercase tracking-widest mb-2">360dialog API Key</label>
                                             <input type="password" placeholder="D3BXXXXXXXXXXXXXXXX" value={waKey} onChange={e => setWaKey(e.target.value)}
                                                 className="w-full bg-[#080C17] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C9A84C] transition-colors" />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">WhatsApp Number</label>
+                                            <label className="block text-xs font-bold text-white/58 uppercase tracking-widest mb-2">WhatsApp Number</label>
                                             <input type="text" placeholder="+27 82 000 0000" value={waNumber} onChange={e => setWaNumber(e.target.value)}
                                                 className="w-full bg-[#080C17] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C9A84C] transition-colors" />
                                         </div>
@@ -117,7 +115,7 @@ const Onboarding = () => {
                             {currentStep === 2 && (
                                 <div className="space-y-6">
                                     <h3 className="font-outfit font-black text-3xl text-white">Add Your Inventory</h3>
-                                    <p className="text-white/50">Upload your vehicles so the AI can start quoting customers.</p>
+                                    <p className="text-white/58">Upload your vehicles so the AI can start quoting customers.</p>
 
                                     <div className="grid grid-cols-2 gap-4 pt-4">
                                         <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-center cursor-pointer hover:bg-white/5 transition-colors group">
@@ -125,17 +123,17 @@ const Onboarding = () => {
                                                 <Upload size={24} />
                                             </div>
                                             <h4 className="font-bold text-white">Bulk CSV Upload</h4>
-                                            <p className="text-xs text-white/40">Upload a spreadsheet</p>
+                                            <p className="text-xs text-white/58">Upload a spreadsheet</p>
                                         </div>
                                         <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-center cursor-pointer hover:bg-white/5 transition-colors group">
                                             <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0A0F1E] transition-all">
                                                 <Car size={24} />
                                             </div>
                                             <h4 className="font-bold text-white">Add Manually</h4>
-                                            <p className="text-xs text-white/40">Enter one by one</p>
+                                            <p className="text-xs text-white/58">Enter one by one</p>
                                         </div>
                                     </div>
-                                    <button className="w-full py-3 mt-4 rounded-xl border border-white/5 flex items-center justify-center gap-2 text-white/50 hover:text-white hover:bg-white/5 transition-colors">
+                                    <button className="w-full py-3 mt-4 rounded-xl border border-white/5 flex items-center justify-center gap-2 text-white/58 hover:text-white hover:bg-white/5 transition-colors">
                                         <Download size={16} /> Download CSV Template
                                     </button>
                                 </div>
@@ -145,7 +143,7 @@ const Onboarding = () => {
                             {currentStep === 3 && (
                                 <div className="space-y-6">
                                     <h3 className="font-outfit font-black text-3xl text-white">Embed Web Widget</h3>
-                                    <p className="text-white/50">Paste this line of code before the closing <code className="text-[#C9A84C]">&lt;/body&gt;</code> tag of your website (WordPress, Wix, etc).</p>
+                                    <p className="text-white/58">Paste this line of code before the closing <code className="text-[#C9A84C]">&lt;/body&gt;</code> tag of your website (WordPress, Wix, etc).</p>
 
                                     <div className="bg-[#080C17] border border-white/10 rounded-xl p-4 relative font-mono text-sm text-white/70 overflow-x-auto">
                                         &lt;script src="https://kenganauto.co.za/api/widget.js?tenant={user?.tenant_id || 'demo'}" defer&gt;&lt;/script&gt;
@@ -156,11 +154,11 @@ const Onboarding = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-xs font-bold uppercase tracking-widest text-white/30">Integration Guides</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-white/58">Integration Guides</p>
                                         <div className="flex gap-2">
-                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/60 hover:text-white cursor-pointer transition-colors">WordPress</span>
-                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/60 hover:text-white cursor-pointer transition-colors">Wix</span>
-                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/60 hover:text-white cursor-pointer transition-colors">Squarespace</span>
+                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/66 hover:text-white cursor-pointer transition-colors">WordPress</span>
+                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/66 hover:text-white cursor-pointer transition-colors">Wix</span>
+                                            <span className="px-3 py-1 rounded bg-white/5 text-xs text-white/66 hover:text-white cursor-pointer transition-colors">Squarespace</span>
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +168,7 @@ const Onboarding = () => {
                             {currentStep === 4 && (
                                 <div className="space-y-6">
                                     <h3 className="font-outfit font-black text-3xl text-white">Add Your Team</h3>
-                                    <p className="text-white/50">Invite colleagues to help manage leads and vehicle stock.</p>
+                                    <p className="text-white/58">Invite colleagues to help manage leads and vehicle stock.</p>
 
                                     <div className="space-y-3">
                                         <div className="flex gap-2">
@@ -196,10 +194,10 @@ const Onboarding = () => {
                                         <CheckCircle size={48} />
                                     </div>
                                     <h3 className="font-outfit font-black text-4xl text-white">You're Ready!</h3>
-                                    <p className="text-white/50">Your dealership is now powered by KenganAuto OS.</p>
+                                    <p className="text-white/58">Your dealership is now powered by KenganAuto OS.</p>
 
                                     <div className="bg-[#111A30] border border-white/5 rounded-2xl p-6 text-left space-y-3 mt-6">
-                                        <p className="text-xs font-bold tracking-widest uppercase text-white/30 mb-4">Launch Checklist</p>
+                                        <p className="text-xs font-bold tracking-widest uppercase text-white/58 mb-4">Launch Checklist</p>
                                         <div className="flex items-center gap-3 text-white/70">
                                             <CheckCircle size={16} className="text-emerald-400" /> WhatsApp API Active
                                         </div>
@@ -219,14 +217,14 @@ const Onboarding = () => {
                     {/* Footer Controls */}
                     <div className="mt-auto pt-8 flex items-center justify-between border-t border-white/5">
                         {currentStep > 1 && currentStep < 5 ? (
-                            <button onClick={() => setCurrentStep(s => s - 1)} className="px-6 py-2 rounded-xl text-white/50 hover:text-white transition-colors">
+                            <button onClick={() => setCurrentStep(s => s - 1)} className="px-6 py-2 rounded-xl text-white/58 hover:text-white transition-colors">
                                 Back
                             </button>
                         ) : <div />}
 
                         {currentStep < 5 ? (
                             <div className="flex items-center gap-4">
-                                <button onClick={handleNext} className="text-sm font-bold text-white/40 hover:text-white transition-colors">Skip for now</button>
+                                <button onClick={handleNext} className="text-sm font-bold text-white/58 hover:text-white transition-colors">Skip for now</button>
                                 <button onClick={handleNext} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#C9A84C] text-[#0A0F1E] font-bold shadow-lg hover:opacity-90 transition-opacity">
                                     Next Step <ChevronRight size={18} />
                                 </button>

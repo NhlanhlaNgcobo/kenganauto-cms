@@ -112,15 +112,20 @@ class NotificationService {
     }
 
     // --- WHATSAPP DISPATCHER ---
-    async sendWhatsApp(to, message, bypassHours = false) {
+    async sendWhatsApp(to, message, bypassHours = false, tenantId = 1) {
         if (!bypassHours && !isWithinHours()) {
             logger.warn(`[WA BLOCKED] Night-time routing active. Queueing msg for ${to}`);
             return { success: false, queued: true };
         }
+        if (!to) {
+            // No phone number — just log to queue (e.g. internal alerts without customer phone)
+            this._pushToQueue('WHATSAPP_ALERT', message);
+            return { success: true, queued_to_log: true };
+        }
         logger.info(`[WA] To: ${to} | Msg: ${message}`);
         this._pushToQueue('WHATSAPP_SENT', `Sent to ${to}: ${message}`);
         try {
-            await whatsappService.sendText(1, to, message);
+            await whatsappService.sendText(tenantId, to, message);
             return { success: true };
         } catch (e) { return { success: false, error: e.message }; }
     }
@@ -198,6 +203,44 @@ class NotificationService {
         if (channel === 'email') return await this.sendEmail(to, 'KenganAuto Test Email', 'System Test', '<p>This is a test notification from your KenganAuto OS Settings.</p>');
         if (channel === 'whatsapp') return await this.sendWhatsApp(to, 'This is a test WhatsApp message from KenganAuto OS.', true);
         if (channel === 'sms') return await this.sendSMS(to, 'KenganAuto OS Test SMS');
+    }
+
+    /**
+     * Called when a lead reaches a qualified intent (Test Drive, Finance, Service, Trade-In).
+     * Notifies the sales team via the internal CRM queue.
+     * @param {object} options - { tenant, lead, conversationId, intent, channel }
+     */
+    async notifyLeadQualified({ tenant, lead, conversationId, intent, channel }) {
+        const tenantId = tenant?.id || 1;
+        const leadName = lead?.customer_name || lead?.name || 'Unknown Customer';
+        const vehicle = lead?.vehicle_interest || lead?.vehicle || 'a vehicle';
+        const intentLabel = intent?.replace(/_/g, ' ').toLowerCase() || 'qualified intent';
+
+        const message = `🎯 QUALIFIED LEAD: ${leadName} expressed a ${intentLabel} interest in ${vehicle} via ${channel || 'chatbot'}. (Tenant: ${tenant?.name || tenantId})`;
+        this._pushToQueue('LEAD_QUALIFIED', message);
+        logger.info({ tenantId, leadName, intent, channel }, 'Lead qualified notification triggered');
+
+        // WhatsApp alert to team if hot enough (score >= 70)
+        if (mockNotificationSettings.whatsapp.hot_lead.active && (lead?.ai_score >= 70 || intent === 'TEST_DRIVE')) {
+            try {
+                await whatsappService.sendText(tenantId, null, message); // null phone = internal queue log only
+            } catch { /* non-fatal */ }
+        }
+    }
+
+    /**
+     * Called when a customer requests a human agent (frustrated or explicit handoff).
+     * This triggers an urgent escalation alert to team.
+     * @param {object} options - { tenant, lead, conversationId, channel }
+     */
+    async notifyHumanHandoff({ tenant, lead, conversationId, channel }) {
+        const tenantId = tenant?.id || 1;
+        const leadName = lead?.customer_name || lead?.name || 'Unknown Customer';
+        const phone = lead?.customer_phone || lead?.phone || 'No phone';
+
+        const message = `🚨 HUMAN HANDOFF REQUIRED: ${leadName} (${phone}) is requesting a real agent via ${channel || 'chatbot'}. Conversation ID: ${conversationId || 'N/A'}`;
+        this._pushToQueue('HUMAN_HANDOFF', message);
+        logger.warn({ tenantId, leadName, channel, conversationId }, 'Human handoff triggered');
     }
 }
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 import {
   LayoutDashboard, Users, MessageSquare, Calculator,
   ArrowLeftRight, Package, Wrench, ShoppingBag,
-  HeartHandshake, Headphones, Settings, HelpCircle, LogOut,
-  MessageCircle, Globe, Bell, CreditCard, Shield, Key
+  HeartHandshake, Headphones, HelpCircle, LogOut,
+  MessageCircle, Globe, Bell, CreditCard, Shield, Key, AlarmClock,
+  Target, HeartPulse, Sparkles, ShoppingCart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ROLE_NAV, ROLE_COLORS } from '../config/roles';
@@ -13,25 +15,29 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 /* ── All possible nav items — filtered by role at render time ── */
 const ALL_NAV_ITEMS = [
-  { module: 'dashboard', name: 'Analytics', icon: LayoutDashboard, path: '/analytics' },
-  { module: 'leads', name: 'Leads', icon: Users, path: '/leads', liveOverdue: true },
-  { module: 'chatbot', name: 'AI Chat', icon: MessageSquare, path: '/chatbot', badge: true },
-  { module: 'finance', name: 'Finance', icon: Calculator, path: '/finance' },
-  { module: 'trade-in', name: 'Trade-In', icon: ArrowLeftRight, path: '/trade-ins' },
-
-  { module: 'stock', name: 'Inventory', icon: Package, path: '/stock' },
-  { module: 'service', name: 'Service', icon: Wrench, path: '/service' },
-  { module: 'parts', name: 'Parts', icon: ShoppingBag, path: '/parts' },
-  { module: 'retention', name: 'Retention', icon: HeartHandshake, path: '/retention' },
-  { module: 'support', name: 'Support', icon: Headphones, path: '/support' },
-  { module: 'whatsapp', name: 'WhatsApp', icon: MessageCircle, path: '/settings/whatsapp' },
-  { module: 'widget', name: 'Web Widget', icon: Globe, path: '/settings/widget' },
-  { module: 'dashboard', name: 'Notifications', icon: Bell, path: '/settings/notifications' },
-  { module: 'dashboard', name: 'Integrations', icon: Settings, path: '/settings/integrations' },
-  { module: 'dashboard', name: 'Billing', icon: CreditCard, path: '/settings/billing' },
-  { module: 'dashboard', name: 'SuperAdmin', icon: Shield, path: '/superadmin', adminOnly: true },
-  { module: 'dashboard', name: 'API Config', icon: Key, path: '/superadmin/api-settings', adminOnly: true },
-  { module: 'customers', name: 'Customers', icon: Users, path: '/leads' },
+  { module: 'dashboard', name: 'Overview', icon: LayoutDashboard, path: '/dashboard', section: 'Workspace' },
+  { module: 'dashboard', name: 'Analytics', icon: LayoutDashboard, path: '/analytics', section: 'Workspace' },
+  { module: 'ai-impact', name: 'AI Impact', icon: Sparkles, path: '/ai-impact', section: 'Workspace' },
+  { module: 'followups', name: 'Action Queue', icon: AlarmClock, path: '/action-queue', liveFollowups: true, section: 'Sales' },
+  { module: 'leads', name: 'Leads', icon: Users, path: '/leads', liveOverdue: true, section: 'Sales' },
+  { module: 'online-deals', name: 'Online Deals', icon: ShoppingCart, path: '/online-deals', section: 'Sales' },
+  { module: 'customers', name: 'Customers', icon: Users, path: '/customers', section: 'Sales' },
+  { module: 'chatbot', name: 'AI Chat', icon: MessageSquare, path: '/chatbot', badge: true, section: 'Sales' },
+  { module: 'finance', name: 'Finance', icon: Calculator, path: '/finance', section: 'Sales' },
+  { module: 'trade-in', name: 'Trade-Ins', icon: ArrowLeftRight, path: '/trade-ins', section: 'Sales' },
+  { module: 'targets', name: 'Targets', icon: Target, path: '/targets', section: 'Sales' },
+  { module: 'stock', name: 'Inventory', icon: Package, path: '/stock', section: 'Operations' },
+  { module: 'service', name: 'Service', icon: Wrench, path: '/service', section: 'Operations' },
+  { module: 'parts', name: 'Parts', icon: ShoppingBag, path: '/parts', section: 'Operations' },
+  { module: 'retention', name: 'Retention', icon: HeartHandshake, path: '/retention', section: 'Operations' },
+  { module: 'customer-care', name: 'Customer Care', icon: HeartPulse, path: '/customer-care', section: 'Operations' },
+  { module: 'support', name: 'Support', icon: Headphones, path: '/support', section: 'Operations' },
+  { module: 'whatsapp', name: 'WhatsApp', icon: MessageCircle, path: '/settings/whatsapp', section: 'Settings' },
+  { module: 'widget', name: 'Web Widget', icon: Globe, path: '/settings/chatbot', section: 'Settings' },
+  { module: 'dashboard', name: 'Notifications', icon: Bell, path: '/settings/notifications', section: 'Settings' },
+  { module: 'dashboard', name: 'Billing', icon: CreditCard, path: '/settings/billing', section: 'Settings' },
+  { module: 'dashboard', name: 'SuperAdmin', icon: Shield, path: '/superadmin', adminOnly: true, section: 'Admin' },
+  { module: 'dashboard', name: 'API Config', icon: Key, path: '/superadmin/api-settings', adminOnly: true, section: 'Admin' },
 ];
 
 const Sidebar = ({ onClose }) => {
@@ -67,7 +73,7 @@ const Sidebar = ({ onClose }) => {
     return true;
   });
 
-  /* Deduplicate by path (customers + leads can both point to /leads) */
+  /* Deduplicate by path */
   const seen = new Set();
   const uniqueNav = navItems.filter(item => {
     if (seen.has(item.path)) return false;
@@ -76,145 +82,114 @@ const Sidebar = ({ onClose }) => {
   });
 
   const roleStyle = user ? (ROLE_COLORS[user.role] || ROLE_COLORS.salesperson) : ROLE_COLORS.salesperson;
-
-  const tooltipStyle = {
-    background: 'rgba(10,15,30,0.95)',
-    border: '1px solid rgba(201,168,76,0.2)',
-    color: '#C9A84C',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-    backdropFilter: 'blur(12px)',
-  };
+  const groupedNav = uniqueNav.reduce((acc, item) => {
+    const section = item.section || 'Workspace';
+    if (!acc[section]) acc[section] = [];
+    acc[section].push(item);
+    return acc;
+  }, {});
 
   return (
     <aside className="sidebar-luxury h-screen flex-shrink-0 select-none flex flex-col">
-
-      {/* KA Monogram */}
-      <div
-        className="w-12 h-12 mx-auto mt-1 mb-8 flex items-center justify-center rounded-2xl cursor-pointer"
-        style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))',
-          border: '1px solid rgba(201,168,76,0.3)',
-          boxShadow: '0 0 20px rgba(201,168,76,0.12)',
-        }}
-        onClick={() => navigate('/dashboard')}
-      >
-        <span className="font-outfit font-black text-lg leading-none text-[#C9A84C]">K</span>
-        <span className="font-outfit font-black text-lg leading-none text-white/30">A</span>
-      </div>
-
-      {/* Role Indicator */}
-      {user && (
-        <div
-          className="mx-3 mb-6 px-2 py-2 rounded-xl text-center"
-          style={{ background: roleStyle.bg, border: `1px solid ${roleStyle.text}25` }}
+      <div className="px-5 pt-5 pb-4 border-b border-white/8">
+        <button
+          className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left transition hover:border-[#C9A84C]/30 hover:bg-white/[0.07]"
+          onClick={() => navigate('/dashboard')}
         >
-          <p className="text-[8px] font-black uppercase tracking-widest leading-none" style={{ color: roleStyle.text }}>
-            {user.role?.replace(/_/g, ' ')}
-          </p>
-        </div>
-      )}
-
-      {/* Nav Items */}
-      <nav className="flex-1 flex flex-col items-center gap-1 w-full px-3 overflow-y-auto">
-        {uniqueNav.map(item => (
-          <NavLink
-            key={item.path + item.module}
-            to={item.path}
-            title={item.name}
-            onClick={() => onClose && onClose()}
-            className={({ isActive }) => `sidebar-icon-btn group w-full ${isActive ? 'active' : ''}`}
-          >
-            {({ isActive }) => (
-              <>
-                <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.75} />
-
-                {/* Live overdue alert badge — Leads icon */}
-                {item.liveOverdue && overdueCount > 0 && (
-                  <div
-                    className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full flex items-center justify-center text-[8px] font-black z-10"
-                    style={{
-                      background: '#EF4444',
-                      color: '#fff',
-                      border: '1.5px solid #080D1A',
-                      boxShadow: '0 0 8px rgba(239,68,68,0.7)',
-                    }}
-                  >
-                    {overdueCount > 9 ? '9+' : overdueCount}
-                  </div>
-                )}
-
-                {/* Static notification dot (e.g. AI Chat) */}
-                {item.badge && !item.liveOverdue && <div className="badge-dot" />}
-
-                {/* Hover tooltip */}
-                <div
-                  className="absolute left-full ml-4 px-3 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pointer-events-none z-50 opacity-0 invisible translate-x-1 group-hover:opacity-100 group-hover:visible group-hover:translate-x-0 transition-all duration-200"
-                  style={tooltipStyle}
-                >
-                  {item.name}
-                  {item.liveOverdue && overdueCount > 0 && (
-                    <span
-                      className="ml-2 px-1.5 py-0.5 rounded-full text-[9px] font-black"
-                      style={{ background: 'rgba(239,68,68,0.2)', color: '#F87171' }}
-                    >
-                      {overdueCount} overdue
-                    </span>
-                  )}
-                </div>
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* Footer */}
-      <div
-        className="flex flex-col items-center gap-1 px-3 pt-4 pb-6 w-full"
-        style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}
-      >
-        {/* User avatar */}
-        {user && (
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-outfit font-black text-sm mb-3"
-            style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', color: '#C9A84C' }}
-          >
-            {(user.first_name?.[0] || '') + (user.last_name?.[0] || '')}
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#C9A84C]/25 bg-[#C9A84C]/10">
+            <span className="font-outfit text-base font-black text-[#C9A84C]">KA</span>
           </div>
-        )}
-
-        <button className="sidebar-icon-btn w-full group" title="Settings">
-          <Settings size={18} strokeWidth={1.75} />
-          <div className="absolute left-full ml-4 px-3 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pointer-events-none z-50 opacity-0 invisible translate-x-1 group-hover:opacity-100 group-hover:visible group-hover:translate-x-0 transition-all duration-200" style={tooltipStyle}>
-            Settings
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#C9A84C]">KenganAuto OS</p>
+            <p className="truncate pt-1 text-sm font-semibold text-white/88">{user?.tenant_name || 'Dealership Workspace'}</p>
           </div>
         </button>
 
-        <button onClick={() => { navigate('/help'); onClose && onClose(); }} className="sidebar-icon-btn w-full group" title="Help">
-          <HelpCircle size={18} strokeWidth={1.75} />
-          <div className="absolute left-full ml-4 px-3 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pointer-events-none z-50 opacity-0 invisible translate-x-1 group-hover:opacity-100 group-hover:visible group-hover:translate-x-0 transition-all duration-200" style={tooltipStyle}>
-            Help
+        {user && (
+          <div className="mt-4 border-t border-white/8 px-1 pt-4">
+            <p className="text-[11px] font-black uppercase tracking-[0.24em]" style={{ color: roleStyle.text }}>
+              {user.role?.replace(/_/g, ' ')}
+            </p>
+            <p className="pt-1 text-sm font-semibold text-white/82">
+              {user.first_name} {user.last_name}
+            </p>
           </div>
+        )}
+      </div>
+
+      <nav className="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
+        {Object.entries(groupedNav).map(([section, items]) => (
+          <div key={section} className="mb-6">
+            <p className="px-3 pb-2 text-[11px] font-black uppercase tracking-[0.24em] text-white/58">
+              {section}
+            </p>
+
+            <div className="space-y-1.5">
+              {items.map((item) => (
+                <NavLink
+                  key={item.path + item.module}
+                  to={item.path}
+                  onClick={() => onClose && onClose()}
+                  className={({ isActive }) =>
+                    `sidebar-icon-btn w-full ${isActive ? 'active' : ''}`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border ${isActive ? 'border-[#C9A84C]/25 bg-[#C9A84C]/12 text-[#C9A84C]' : 'border-transparent bg-white/[0.04] text-white/66'}`}>
+                        <item.icon size={18} strokeWidth={isActive ? 2.25 : 1.9} />
+                      </div>
+
+                      <div className="min-w-0 flex-1 text-left">
+                        <div className="flex items-center gap-2">
+                          <span className={`truncate text-sm font-semibold ${isActive ? 'text-white' : 'text-white/76'}`}>
+                            {item.name}
+                          </span>
+                          {item.badge && !item.liveOverdue ? <span className="h-2 w-2 rounded-full bg-[#C9A84C]" /> : null}
+                        </div>
+                        {item.liveOverdue ? (
+                          <p className={`pt-0.5 text-xs ${overdueCount > 0 ? 'text-red-300' : 'text-white/58'}`}>
+                            {overdueCount > 0 ? `${overdueCount} overdue follow-ups` : 'No overdue follow-ups'}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {item.liveOverdue && overdueCount > 0 ? (
+                        <div className="flex min-w-[26px] justify-center rounded-full bg-red-700 px-2 py-1 text-[12px] font-black text-white">
+                          {overdueCount > 9 ? '9+' : overdueCount}
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="border-t border-white/8 px-4 py-4">
+        <ThemeToggle />
+
+        <button
+          onClick={() => { navigate('/help'); onClose && onClose(); }}
+          className="sidebar-icon-btn mt-2 w-full"
+        >
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/[0.04] text-white/66">
+            <HelpCircle size={18} strokeWidth={1.9} />
+          </div>
+          <span className="flex-1 text-left text-sm font-semibold text-white/76">Help</span>
         </button>
 
         <button
           onClick={logout}
-          className="sidebar-icon-btn w-full group mt-1"
-          title="Log Out"
-          style={{ color: 'rgba(248,113,113,0.4)' }}
+          className="sidebar-icon-btn mt-2 w-full border-red-500/10 hover:border-red-500/20 hover:bg-red-500/8"
         >
-          <LogOut size={18} strokeWidth={1.75} />
-          <div
-            className="absolute left-full ml-4 px-3 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pointer-events-none z-50 opacity-0 invisible translate-x-1 group-hover:opacity-100 group-hover:visible group-hover:translate-x-0 transition-all duration-200"
-            style={{ ...tooltipStyle, border: '1px solid rgba(239,68,68,0.2)', color: '#F87171' }}
-          >
-            Log Out
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-300">
+            <LogOut size={18} strokeWidth={1.9} />
           </div>
+          <span className="flex-1 text-left text-sm font-semibold text-red-200">Log Out</span>
         </button>
-
-        {/* Version Indicator */}
-        <div className="mt-4 mb-2 text-[9px] font-mono font-bold tracking-widest text-white/20 select-text">
-          v1.0.0-rc
-        </div>
       </div>
     </aside>
   );
